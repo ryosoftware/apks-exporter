@@ -318,10 +318,9 @@ fun MainScreen(
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp)
                 )
-
                 Text(
-                    text = if (item.apkDataSize != -1L && item.apkCacheSize != -1L) {
-                        pluralStringResource(R.plurals.count_apks_extended_with_data_size, item.apkCount, item.apkCount, sizeToStr(item.apkSize), sizeToStr(item.apkDataSize + item.apkCacheSize))
+                    text = if (item.totalSize != -1L) {
+                        pluralStringResource(R.plurals.count_apks_extended_with_data_size, item.apkCount, item.apkCount, sizeToStr(item.apkSize), sizeToStr(item.totalSize))
                     } else {
                         pluralStringResource(R.plurals.count_apks_extended, item.apkCount, item.apkCount, sizeToStr(item.apkSize))
                     },

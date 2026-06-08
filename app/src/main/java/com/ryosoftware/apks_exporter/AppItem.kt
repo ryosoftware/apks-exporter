@@ -44,12 +44,11 @@ data class AppItem(
         return total
     }
 
-    val apkDataSize: Long get() {
-        return stats?.dataBytes ?: -1L
-    }
-
-    val apkCacheSize: Long get() {
-        return stats?.cacheBytes ?: -1L
+    val totalSize: Long get() {
+        if (stats == null) {
+            return -1L
+        }
+        return stats.appBytes + stats.dataBytes + stats.cacheBytes
     }
 
     fun canAutomaticallyBackup(): Boolean = MainService.canAutomaticallyBackup(packageInfo)

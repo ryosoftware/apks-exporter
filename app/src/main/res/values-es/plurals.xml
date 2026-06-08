@@ -27,9 +27,9 @@
     </plurals>
 
     <plurals name="count_apks_extended_with_data_size">
-        <item quantity="one">La app incluye %1$d APK que ocupa alrededor de %2$s (el tamaño de los datos de la app es de alrededor de %3$s)</item>
-        <item quantity="other">La app incluye %1$d APKs que ocupan alrededor de %2$s (el tamaño de los datos de la app es de alrededor de %3$s)</item>
-        <item quantity="many">La app incluye %1$d APKs que ocupan alrededor de %2$s (el tamaño de los datos de la app es de alrededor de %3$s)</item>
+        <item quantity="one">La app incluye %1$d APK que ocupa alrededor de %2$s (el tamaño total ocupado, incluyendo los datos de la app, es de alrededor de %3$s)</item>
+        <item quantity="other">La app incluye %1$d APKs que ocupan alrededor de %2$s (el tamaño total ocupado, incluyendo los datos de la app, es de alrededor de %3$s)</item>
+        <item quantity="many">La app incluye %1$d APKs que ocupan alrededor de %2$s (el tamaño total ocupado, incluyendo los datos de la app, es de alrededor de %3$s)</item>
     </plurals>
 
     <plurals name="save_app_package">
