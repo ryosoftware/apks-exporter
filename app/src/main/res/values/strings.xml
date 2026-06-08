@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+
+    <string name="app_name">APKs Exporter</string>
+
+    <string name="background_tasks">Background Tasks</string>
+    <string name="auto_created_backups">Auto created backups</string>
+    <string name="auto_created_backups_error">Error performing backup</string>
+    <string name="auto_created_backups_none">No apps to Backup</string>
+
+    <string name="settings">Settings</string>
+
+    <string name="apps_list">Apps List</string>
+
+    <string name="show_system_apps">Show system apps</string>
+    <string name="show_system_apps_on">Apps list will show System and User Apps</string>
+    <string name="show_system_apps_off">Apps list will show only user apps (apps with auto-backup enabled are always shown if Auto-Backup Apps is enabled)</string>
+
+    <string name="show_system_apps_only_if_updated">Show System Apps only if updated</string>
+    <string name="show_system_apps_only_if_updated_on">System Apps will be shown only if updated</string>
+    <string name="show_system_apps_only_if_updated_off">System Apps will be shown in any case, even if not updated</string>
+
+    <string name="sort_updated_apps_first">Updated apps first</string>
+    <string name="sort_updated_apps_first_on">Sort apps using his label, but apps that has been updated recently are shown first</string>
+    <string name="sort_updated_apps_first_off">Sort apps using his label</string>
+
+    <string name="storage">Storage</string>
+
+    <string name="save_folder">Save folder</string>
+    <string name="save_folder_not_set">Click to select the folder on the app will store backups</string>
+    <string name="no_save_folder_selected">No local folder selected.\n\nPlease, go App Settings then select a folder to store backup files</string>
+    <string name="cant_write_to_local_selected_folder">Can\'t create files at local selected folder.\n\nPlease, allow the app to create files in that folder</string>
+
+    <string name="backup_format">Backup Files Format</string>
+
+    <string name="use_app_label">App Label</string>
+    <string name="use_app_label_on">Use app name (whitespaces at app name will be removed) instead of app package name to generate the backup filename</string>
+    <string name="use_app_label_off">@string/use_app_label_on</string>
+
+    <string name="use_long_version_number">Version number</string>
+    <string name="use_long_version_number_on">Use the Long App version number that usually is made up of several numbers, including some letters, and may not change between consecutive releases of the app, while the short number is an integer that uniquely identifies a release</string>
+    <string name="use_long_version_number_off">@string/use_long_version_number_on</string>
+
+    <string name="save_as_zip_file">Save as compressed file</string>
+    <string name="save_as_zip_file_on">Save (and share) multi-apk apps in a single compressed file; use a file named by the app name and version for storage purposes</string>
+    <string name="save_as_zip_file_off">Save (and share) multi-apk apps in multiple files; use a directory named by the app name and a subfolder names by the app version for storage purposes</string>
+
+    <string name="do_not_compress_single_files">Do not force compression</string>
+    <string name="do_not_compress_single_files_on">Do not compress app backups that contain only one file</string>
+    <string name="do_not_compress_single_files_off">Compress all backups, even those that contain only one file</string>
+
+    <string name="apkm_extension">Use .apkm extension</string>
+    <string name="apkm_extension_on">Use .apkm instead of .zip as the file extension for compressed backups</string>
+    <string name="apkm_extension_off">Use .zip as the file extension for compressed backups</string>
+
+    <string name="automation">Automation</string>
+
+    <string name="auto_backup_apps">Auto backup Apps</string>
+    <string name="auto_backup_apps_on">Automatically save the APKs of apps that are installed or updated (following the display preferences selected above). A background process will run periodically and check which apps meet the criteria (if an app is updated multiple times during that period, part of its history will be lost).</string>    <string name="auto_backup_apps_off">Do not automatically save APKs for apps that are installed or updated</string>
+    <string name="can_automatically_backup">Automatize App backup</string>
+
+    <string name="auto_enable_new_apps">New installed Apps</string>
+    <string name="auto_enable_new_apps_on">Newly installed apps will have automatic backup enabled by default</string>
+    <string name="auto_enable_new_apps_off">Newly installed apps will not have automatic backup enabled by default</string>
+
+    <string name="force_backup_now">Create pending backups now</string>
+    <string name="auto_backup_last_date">Last process execution time: %1$s</string>
+    <string name="auto_backup_next_date">Next process planned execution time: %1$s</string>
+    <string name="auto_backup_last_date_format">MM/dd/yyyy hh:mm a</string>
+    <string name="force_backup_now_summary">Click to execute backup process now</string>
+    <string name="force_backup_running">Backup process is running&#8230;</string>
+
+    <string name="appearance">Appearance</string>
+
+    <string name="theme">Theme</string>
+    <string name="dark_theme">Dark</string>
+    <string name="light_theme">Light</string>
+    <string name="system_theme">Follow system</string>
+
+    <string name="black_background">Pure black background</string>
+    <string name="black_background_on">Use a pure black background</string>
+    <string name="black_background_off">Use system background color</string>
+
+    <string name="use_system_accent_color">System Accent color</string>
+    <string name="use_system_accent_color_on">Follow the System Accent Color</string>
+    <string name="use_system_accent_color_off">Use accenture colors defined by the App</string>
+
+    <string name="permissions_title">Permissions</string>
+    <string name="usage_access">Usage access</string>
+    <string name="usage_access_granted">Permission granted. The app can access usage statistics to show data size.</string>
+    <string name="usage_access_not_granted">[Optional] Grant it to show the space occupied by app data in addition to APK size.</string>
+
+    <string name="about">About</string>
+
+    <string name="github_repo">GitHub repo</string>
+    <string name="github_repo_summary">Click to browse the app\'s source code, including the License agreement.</string>
+
+    <string name="app_version_name">App Version</string>
+    <string name="app_version_name_summary">%1$s (%2$s)</string>
+    <string name="app_version_name_and_number">%1$s (%2$d)</string>
+
+    <string name="install_app">Install app</string>
+    <string name="install_app_description">Select the app do you want to install (only .apk, .zip, and .apkm files are supported)</string>
+
+    <string name="uninstall_app">Uninstall</string>
+    <string name="uninstall_updates">Uninstall updates</string>
+    <string name="app_info">App info</string>
+    <string name="open_app">Open app</string>
+    <string name="share_app">Share APK</string>
+
+    <string name="app_detail_info">App details</string>
+    <string name="open_system_app_info">App Info at system settings</string>
+    <string name="version">Version</string>
+    <string name="requires_android">Requires Android</string>
+    <string name="installed">Installed</string>
+    <string name="last_updated">Last updated</string>
+    <string name="app_storage">App Storage</string>
+    <string name="apks_total">APKs</string>
+    <string name="data_size">Data</string>
+    <string name="cache_size">Cache</string>
+
+    <string name="apk_files">APK files</string>
+    <string name="base_apk">Base APK</string>
+    <string name="split_apk">Split APK %1$d</string>
+    <string name="total_size">Total: %1$s</string>
+    <string name="permissions">Permissions</string>
+    <string name="signatures">Signatures</string>
+    <string name="signer_single">Signer</string>
+    <string name="signer">Signer %1$d</string>
+    <string name="manifest_components">Manifest components</string>
+    <string name="activities">Activities</string>
+    <string name="services">Services</string>
+    <string name="receivers">Receivers</string>
+    <string name="providers">Providers</string>
+
+    <string name="checking_if_recently_installed_or_updated_apps">Checking if there are recently installed or updated apps</string>
+
+    <string name="error_performing_auto_apps_backup">A crash error has been occurred while trying to create backups for recently installed or updated apps</string>
+
+    <string name="cant_complete_requested_operation">Can\'t complete requested operation</string>
+    <string name="install_success">¡App installed!</string>
+    <string name="operation_done">Requested operation done!</string>
+
+    <string name="select_all">Select All</string>
+    <string name="select_none">Select None</string>
+    <string name="backup_on">Backup ON</string>
+    <string name="backup_off">Backup OFF</string>
+    <string name="save_selected">Save selected</string>
+    <string name="done">Done</string>
+
+    <string name="save_apps">Save apps</string>
+
+    <string name="no_apps">No apps</string>
+
+    <string name="information">Information</string>
+    <string name="error">Error</string>
+    
+    <string name="accept_button">Accept</string>
+    <string name="cancel_button">Cancel</string>
+
+    <string name="search">Search</string>
+
+    <string name="loading">Loading</string>
+
+    <string name="do_not_show_anymore">Do not show anymore</string>
+
+    <string name="strings_middle_separator">,&#160;</string>
+    <string name="strings_and_separator">&#160;and&#160;</string>
+
+    <string name="selected_count">%d selected</string>
+
+    <string name="badge_app_recently_updated">app updated recently</string>
+    <string name="badge_system_app">system app</string>
+    <string name="badge_autobackup_off">No autobackup</string>
+
+    <string name="size_in_kb">%1$.1f KB</string>
+    <string name="size_in_mb">%1$.1f MB</string>
+    <string name="size_in_gb">%1$.2f GB</string>
+
+    <string name="copied_to_clipboard">Copied to clipboard</string>
+    <string name="system_app">System app</string>
+    <string name="user_app">User app</string>
+    <string name="view_in_play_store">View in Play Store</string>
+    <string name="special_permissions">Special permissions</string>
+    <string name="accessibility">Accessibility</string>
+    <string name="notification_listener">Notification listener</string>
+    <string name="device_admin">Device admin</string>
+    <string name="overlay">Draw over other apps</string>
+    <string name="write_settings">Write system settings</string>
+    <string name="install_unknown_apps">Install unknown apps</string>
+    <string name="manage_all_files">Manage all files</string>
+    <string name="install_source">Installed from</string>
+    <string name="backup_warning_title">Settings changed</string>
+    <string name="backup_warning_message">You have enabled automatic backup and/or changed app visibility settings. This may cause unwanted backups of many apps. Do you want to mark all current apps as already backed up?</string>
+    <string name="backup_warning_skip">Yes, skip backup</string>
+    <string name="backup_warning_continue">No, continue</string>
+    <string name="backup_warning_continue_editing">Continue editing</string>
+
+</resources>

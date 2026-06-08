@@ -1,0 +1,47 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <string name="auto_apps_backup_none">No se necesita crear backup de ninguna de las apps que ha configurado</string>
+
+    <plurals name="auto_apps_backup_ended_without_error">
+        <item quantity="one">Se ha creado el backup de %2$s</item>
+        <item quantity="other">Se han creado los backups de %2$s</item>
+        <item quantity="many">Se han creado los backups de %2$s</item>
+    </plurals>
+
+    <plurals name="auto_apps_backup_ended_with_error">
+        <item quantity="one">Se ha creado el backup de %2$s, pero se han producido errores creando algún otro</item>
+        <item quantity="other">Se han creado los backups de %2$s, pero se han producido errores creando algún otro</item>
+        <item quantity="many">Se han creado los backups de %2$s, pero se han producido errores creando algún otro</item>
+    </plurals>
+
+    <plurals name="count_apks">
+        <item quantity="one">%1$d APK (%2$s)</item>
+        <item quantity="other">%1$d APKs (%2$s)</item>
+        <item quantity="many">%1$d APKs (%2$s)</item>
+    </plurals>
+
+    <plurals name="count_apks_extended">
+        <item quantity="one">La app incluye %1$d APK que ocupa alrededor de %2$s</item>
+        <item quantity="other">La app incluye %1$d APKs que ocupan alrededor de %2$s</item>
+        <item quantity="many">La app incluye %1$d APKs que ocupan alrededor de %2$s</item>
+    </plurals>
+
+    <plurals name="count_apks_extended_with_data_size">
+        <item quantity="one">La app incluye %1$d APK que ocupa alrededor de %2$s (el tamaño de los datos de la app es de alrededor de %3$s)</item>
+        <item quantity="other">La app incluye %1$d APKs que ocupan alrededor de %2$s (el tamaño de los datos de la app es de alrededor de %3$s)</item>
+        <item quantity="many">La app incluye %1$d APKs que ocupan alrededor de %2$s (el tamaño de los datos de la app es de alrededor de %3$s)</item>
+    </plurals>
+
+    <plurals name="save_app_package">
+        <item quantity="one">Guardar el APK en el directorio local</item>
+        <item quantity="other">Guardar los %1$d APKs en el directorio local</item>
+        <item quantity="many">Guardar los %1$d APKs en el directorio local</item>
+    </plurals>
+
+    <plurals name="share_app_package">
+        <item quantity="one">Compartir el APK</item>
+        <item quantity="other">Compartir los %1$d APKs</item>
+        <item quantity="many">Compartir los %1$d APKs</item>
+    </plurals>
+
+</resources>

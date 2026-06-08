@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+ 	<style name="AppBaseTheme.ActionBarStyle" parent="@style/Base.Widget.AppCompat.ActionBar">
+        <item name="android:background">@color/primary</item>
+        <item name="background">@color/primary</item>
+        <item name="elevation">0dp</item>
+    </style>
+ 			
+    <style name="AppThemeDialog" parent="@style/Theme.AppCompat.DayNight.Dialog">
+         <item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
+    	<item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
+        <item name="colorAccent">@color/secondary</item>
+    </style>
+
+    <style name="AppBaseTheme" parent="@style/Theme.AppCompat.DayNight.DarkActionBar">
+        <item name="popupTheme" parent="AppThemePopupMenu" />
+    </style>
+
+</resources>
+
+    

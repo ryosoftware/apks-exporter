@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+
+    <string name="github_repo_link">https://github.com/ryosoftware/apks-exporter</string>
+    <string name="show_system_apps_default">false</string>
+    <string name="show_system_apps_only_if_updated_default">false</string>
+    <string name="save_as_zip_file_default">true</string>
+    <string name="do_not_compress_single_files_default">true</string>
+    <string name="apkm_extension_default">false</string>
+    <string name="use_app_label_default">true</string>
+    <string name="use_long_version_number_default">true</string>
+    <string name="sort_updated_apps_first_default">true</string>
+    <string name="auto_backup_apps_default">false</string>
+    <string name="auto_backup_new_apps_default">true</string>
+    <string name="theme_default">system</string>
+    <string name="black_background_default">false</string>
+    <string name="use_system_accent_color_default">false</string>
+
+</resources>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <string name="auto_apps_backup_none">No one installed App needs to be backed</string>
+
+    <plurals name="auto_apps_backup_ended_without_error">
+        <item quantity="one">Backup of %2$s has been created</item>
+        <item quantity="other">Backups of %2$s have been created</item>
+    </plurals>
+
+    <plurals name="auto_apps_backup_ended_with_error">
+        <item quantity="one">Backup of %2$s has been created, but there was an error when trying to perform other</item>
+        <item quantity="other">Backups of %2$s have been created, but there was an error when trying to perform other</item>
+    </plurals>
+
+    <plurals name="count_apks">
+        <item quantity="one">%1$d APK (%2$s)</item>
+        <item quantity="other">%1$d APKs (%2$s)</item>
+    </plurals>
+
+    <plurals name="count_apks_extended">
+        <item quantity="one">App includes %1$d APK which occupies about %2$s of storage</item>
+        <item quantity="other">App includes %1$d APKs which occupies about %2$s of storage</item>
+    </plurals>
+
+    <plurals name="count_apks_extended_with_data_size">
+        <item quantity="one">App includes %1$d APK which occupies about %2$s of storage (the size of the app\'s data is around %3$s)</item>
+        <item quantity="other">App includes %1$d APKs which occupies about %2$s of storage (the size of the app\'s data is around %3$s)</item>
+    </plurals>
+
+    <plurals name="save_app_package">
+        <item quantity="one">Save APK to local storage</item>
+        <item quantity="other">Save %1$d APKs to local storage</item>
+    </plurals>
+
+    <plurals name="share_app_package">
+        <item quantity="one">Share APK</item>
+        <item quantity="other">Share %1$d APKs</item>
+    </plurals>
+
+</resources>
