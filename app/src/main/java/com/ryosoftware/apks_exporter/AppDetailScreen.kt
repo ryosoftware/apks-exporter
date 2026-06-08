@@ -11,7 +11,6 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Process
 import android.os.storage.StorageManager
 import android.provider.Settings
@@ -63,6 +62,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import com.ryosoftware.utilities.PackageManagerUtilities
 import java.io.ByteArrayInputStream
+import java.io.File
 import java.security.cert.CertificateFactory
 import java.security.MessageDigest
 import java.text.DateFormat
@@ -142,10 +142,11 @@ fun AppDetailScreen(packageName: String, onNavigateBack: () -> Unit) {
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            item { HeaderSection(packageInfo, appIcon, isSystemApp) }
+            val isDisabled = !(packageInfo.applicationInfo?.enabled ?: false)
+            item { HeaderSection(packageInfo, appIcon, isSystemApp, isDisabled) }
             item { InfoSection(packageInfo, installSource) }
             item { ApkSection(packageInfo) }
-            item { StorageStatsSection(packageName) }
+            item { StorageStatsSection(packageName, packageInfo) }
             item { SigningSection(packageInfo) }
             item { ManifestComponentsSection(packageInfo) }
             val perms = packageInfo.requestedPermissions?.toList() ?: emptyList()
@@ -220,7 +221,7 @@ fun AppDetailScreen(packageName: String, onNavigateBack: () -> Unit) {
 }
 
 @Composable
-private fun HeaderSection(packageInfo: PackageInfo, icon: android.graphics.drawable.Drawable?, isSystemApp: Boolean) {
+private fun HeaderSection(packageInfo: PackageInfo, icon: android.graphics.drawable.Drawable?, isSystemApp: Boolean, isDisabled: Boolean = false) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         if (icon != null) {
             AndroidView(
@@ -275,6 +276,30 @@ private fun HeaderSection(packageInfo: PackageInfo, icon: android.graphics.drawa
                         )
                     }
                 }
+                if (isDisabled) {
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = badgeColor.copy(alpha = 0.15f)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_block),
+                                contentDescription = null,
+                                tint = badgeColor,
+                                modifier = Modifier.size(14.dp)
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text(
+                                text = stringResource(R.string.badge_disabled_app),
+                                fontSize = 12.sp,
+                                color = badgeColor
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -323,7 +348,7 @@ private fun ApkSection(packageInfo: PackageInfo) {
 }
 
 @Composable
-private fun StorageStatsSection(packageName: String) {
+private fun StorageStatsSection(packageName: String, packageInfo: PackageInfo) {
     val context = LocalContext.current
     val stats = remember(packageName) {
         if (!isUsageStatsGranted(context)) null
@@ -335,7 +360,21 @@ private fun StorageStatsSection(packageName: String) {
     if (stats != null) {
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             SectionTitle(stringResource(R.string.app_storage))
-            InfoRow(stringResource(R.string.apks_total), formatBytes(stats.appBytes))
+
+            val applicationInfo = packageInfo.applicationInfo
+            if (applicationInfo != null) {
+                var realSize = File(applicationInfo.sourceDir).length()
+                if (!applicationInfo.splitSourceDirs.isNullOrEmpty()) {
+                    for (split in applicationInfo.splitSourceDirs) {
+                        realSize += File(split).length()
+                    }
+                }
+                InfoRow(stringResource(R.string.apks_size), stringResource(R.string.apks_size_extended_value, formatBytes(realSize), formatBytes(stats.appBytes)))
+            }
+            else {
+                InfoRow(stringResource(R.string.apks_size), formatBytes(stats.appBytes))
+            }
+
             InfoRow(stringResource(R.string.data_size), formatBytes(stats.dataBytes))
             InfoRow(stringResource(R.string.cache_size), formatBytes(stats.cacheBytes))
         }

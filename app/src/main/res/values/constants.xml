@@ -7,7 +7,7 @@
     <string name="show_system_apps_only_if_updated_default">false</string>
     <string name="save_as_zip_file_default">true</string>
     <string name="do_not_compress_single_files_default">true</string>
-    <string name="apkm_extension_default">false</string>
+    <string name="apkm_extension_default">true</string>
     <string name="use_app_label_default">true</string>
     <string name="use_long_version_number_default">true</string>
     <string name="sort_updated_apps_first_default">true</string>

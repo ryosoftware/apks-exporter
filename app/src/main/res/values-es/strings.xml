@@ -117,7 +117,8 @@
     <string name="installed">Instalada</string>
     <string name="last_updated">Última actualización</string>
     <string name="app_storage">Almacenamiento</string>
-    <string name="apks_total">APK</string>
+    <string name="apks_size">APKs</string>
+    <string name="apks_size_extended_value">%1$s (%2$s incluyendo archivos compilados y artefactos del sistema)"</string>
     <string name="data_size">Datos</string>
     <string name="cache_size">Caché</string>
 
@@ -173,6 +174,7 @@
 
     <string name="badge_app_recently_updated">app actualizada recientemente</string>
     <string name="badge_system_app">app de sistema</string>
+    <string name="badge_disabled_app">inhabilitada</string>
     <string name="badge_autobackup_off">sin backup automático</string>
 
     <string name="size_in_kb">%1$.1f KB</string>

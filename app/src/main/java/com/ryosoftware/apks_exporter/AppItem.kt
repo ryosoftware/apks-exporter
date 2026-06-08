@@ -23,6 +23,8 @@ data class AppItem(
     val packageName: String get() = packageInfo.packageName
     val versionName: String? get() = packageInfo.versionName
     val versionCode: Long get() = packageInfo.longVersionCode
+
+    val isDisabled: Boolean get() = !(packageInfo.applicationInfo?.enabled ?: false)
     val isSystemApp: Boolean get() = MainService.isSystemApplication(packageInfo)
     val isUpdatedSystemApp: Boolean get() = MainService.isSystemApplicationUpdated(packageInfo)
     val isAppUpdated: Boolean get() = MainService.isAppUpdated(packageInfo)

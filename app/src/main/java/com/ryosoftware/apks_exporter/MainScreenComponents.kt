@@ -590,6 +590,14 @@ fun AppCard(
                             label = stringResource(R.string.badge_system_app)
                         )
                     }
+                    if (item.isDisabled) {
+                        StatusBadge(
+                            icon = painterResource(R.drawable.ic_block),
+                            containerColor = badgeContainer,
+                            tint = badgeTint,
+                            label = stringResource(R.string.badge_disabled_app)
+                        )
+                    }
                     if (item.isAppUpdated && (!item.isAppBacked)) {
                         StatusBadge(
                             icon = painterResource(R.drawable.ic_app_updated),
