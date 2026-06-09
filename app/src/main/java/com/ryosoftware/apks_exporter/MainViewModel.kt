@@ -163,15 +163,22 @@ class MainViewModel @Inject constructor(
 
                 ApplicationPreferences.cleanupOrphanedPreferences(packages)
 
-                result.sortWith(Comparator { left, right ->
-                    val leftUpdatedAndNotBacked = left.isAppUpdated && !left.isAppBacked
-                    val rightUpdatedAndNotBacked = right.isAppUpdated && !right.isAppBacked
+                val sortStates = result.map { it.isAppUpdated to it.isAppBacked }
+
+                val sorted = result.withIndex().sortedWith { (leftIdx, left), (rightIdx, right) ->
+                    val (leftUpdated, leftBacked) = sortStates[leftIdx]
+                    val (rightUpdated, rightBacked) = sortStates[rightIdx]
+                    val leftUpdatedAndNotBacked = leftUpdated && !leftBacked
+                    val rightUpdatedAndNotBacked = rightUpdated && !rightBacked
                     if (!sortUpdatedAppsFirst || leftUpdatedAndNotBacked == rightUpdatedAndNotBacked) {
                         Collator.getInstance().compare(left.appLabel, right.appLabel)
                     } else {
                         if (leftUpdatedAndNotBacked) -1 else 1
                     }
-                })
+                }
+
+                result.clear()
+                result.addAll(sorted.map { it.value })
 
                 return@withContext result
             } catch (e: Exception) {
