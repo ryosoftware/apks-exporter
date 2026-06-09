@@ -15,8 +15,8 @@ android {
 
     defaultConfig {
         applicationId "com.ryosoftware.apks_exporter"
-        versionCode 200001003
-        versionName "2.1.3"
+        versionCode 200001004
+        versionName "2.1.4"
 
         minSdkVersion 33
         targetSdkVersion 37
