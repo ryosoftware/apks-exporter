@@ -28,6 +28,7 @@ class ApplicationPreferences @Inject constructor(
         const val IS_FIRST_APP_LAUNCH_TIME = "is-first-app-launch-time"
         const val SHOW_SYSTEM_PACKAGES_KEY = "show-system-packages"
         const val SHOW_SYSTEM_PACKAGES_ONLY_IF_UPDATED_KEY = "show-system-packages-only-if-updated"
+        const val SHOW_DISABLED_APPS_KEY = "show-disabled-apps"
         const val SAVE_AS_ZIP_FILE_KEY = "save-as-zip-file"
         const val DO_NOT_COMPRESS_SINGLE_FILES_KEY = "do-not-compress-single-files"
         const val APKM_EXTENSION_KEY = "apkm-extension"
@@ -59,6 +60,9 @@ class ApplicationPreferences @Inject constructor(
         var SHOW_SYSTEM_PACKAGES_ONLY_IF_UPDATED_DEFAULT: Boolean
             get() = instance.SHOW_SYSTEM_PACKAGES_ONLY_IF_UPDATED_DEFAULT
             set(v) { instance.SHOW_SYSTEM_PACKAGES_ONLY_IF_UPDATED_DEFAULT = v }
+        var SHOW_DISABLED_APPS_DEFAULT: Boolean
+            get() = instance.SHOW_DISABLED_APPS_DEFAULT
+            set(v) { instance.SHOW_DISABLED_APPS_DEFAULT = v }
         var SAVE_AS_ZIP_FILE_DEFAULT: Boolean
             get() = instance.SAVE_AS_ZIP_FILE_DEFAULT
             set(v) { instance.SAVE_AS_ZIP_FILE_DEFAULT = v }
@@ -111,6 +115,7 @@ class ApplicationPreferences @Inject constructor(
 
     var SHOW_SYSTEM_PACKAGES_DEFAULT = false
     var SHOW_SYSTEM_PACKAGES_ONLY_IF_UPDATED_DEFAULT = false
+    var SHOW_DISABLED_APPS_DEFAULT = true
     var SAVE_AS_ZIP_FILE_DEFAULT = false
     var DO_NOT_COMPRESS_SINGLE_FILES_DEFAULT = false
     var APKM_EXTENSION_DEFAULT = false
@@ -174,6 +179,7 @@ class ApplicationPreferences @Inject constructor(
     private fun initializeConstants() {
         SHOW_SYSTEM_PACKAGES_DEFAULT = java.lang.Boolean.parseBoolean(context.getString(R.string.show_system_apps_default))
         SHOW_SYSTEM_PACKAGES_ONLY_IF_UPDATED_DEFAULT = java.lang.Boolean.parseBoolean(context.getString(R.string.show_system_apps_only_if_updated_default))
+        SHOW_DISABLED_APPS_DEFAULT = java.lang.Boolean.parseBoolean(context.getString(R.string.show_disabled_apps_default))
         SAVE_AS_ZIP_FILE_DEFAULT = java.lang.Boolean.parseBoolean(context.getString(R.string.save_as_zip_file_default))
         DO_NOT_COMPRESS_SINGLE_FILES_DEFAULT = java.lang.Boolean.parseBoolean(context.getString(R.string.do_not_compress_single_files_default))
         APKM_EXTENSION_DEFAULT = java.lang.Boolean.parseBoolean(context.getString(R.string.apkm_extension_default))

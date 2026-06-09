@@ -48,6 +48,10 @@ fun PreferencesScreen(onNavigateBack: () -> Unit) {
         ApplicationPreferences.SHOW_SYSTEM_PACKAGES_ONLY_IF_UPDATED_KEY,
         ApplicationPreferences.SHOW_SYSTEM_PACKAGES_ONLY_IF_UPDATED_DEFAULT
     ).collectAsStateWithLifecycle(initialValue = ApplicationPreferences.SHOW_SYSTEM_PACKAGES_ONLY_IF_UPDATED_DEFAULT)
+    val showDisabledAppsFlow by ApplicationPreferences.observe(
+        ApplicationPreferences.SHOW_DISABLED_APPS_KEY,
+        ApplicationPreferences.SHOW_DISABLED_APPS_DEFAULT
+    ).collectAsStateWithLifecycle(initialValue = ApplicationPreferences.SHOW_DISABLED_APPS_DEFAULT)
     val saveAsZipFileFlow by ApplicationPreferences.observe(
         ApplicationPreferences.SAVE_AS_ZIP_FILE_KEY,
         ApplicationPreferences.SAVE_AS_ZIP_FILE_DEFAULT
@@ -108,6 +112,7 @@ fun PreferencesScreen(onNavigateBack: () -> Unit) {
 
     var showSystemPackages by remember { mutableStateOf(showSystemPackagesFlow) }
     var showSystemPackagesOnlyIfUpdated by remember { mutableStateOf(showSystemPackagesOnlyIfUpdatedFlow) }
+    var showDisabledApps by remember { mutableStateOf(showDisabledAppsFlow) }
     var saveAsZipFile by remember { mutableStateOf(saveAsZipFileFlow) }
     var doNotCompressSingleFiles by remember { mutableStateOf(doNotCompressSingleFilesFlow) }
     var useApkmExtension by remember { mutableStateOf(apkmExtensionFlow) }
@@ -122,6 +127,7 @@ fun PreferencesScreen(onNavigateBack: () -> Unit) {
 
     LaunchedEffect(showSystemPackagesFlow) { showSystemPackages = showSystemPackagesFlow }
     LaunchedEffect(showSystemPackagesOnlyIfUpdatedFlow) { showSystemPackagesOnlyIfUpdated = showSystemPackagesOnlyIfUpdatedFlow }
+    LaunchedEffect(showDisabledAppsFlow) { showDisabledApps = showDisabledAppsFlow }
     LaunchedEffect(saveAsZipFileFlow) { saveAsZipFile = saveAsZipFileFlow }
     LaunchedEffect(doNotCompressSingleFilesFlow) { doNotCompressSingleFiles = doNotCompressSingleFilesFlow }
     LaunchedEffect(apkmExtensionFlow) { useApkmExtension = apkmExtensionFlow }
@@ -329,6 +335,20 @@ fun PreferencesScreen(onNavigateBack: () -> Unit) {
                     onCheckedChange = {
                         showSystemPackagesOnlyIfUpdated = it
                         ApplicationPreferences.put(ApplicationPreferences.SHOW_SYSTEM_PACKAGES_ONLY_IF_UPDATED_KEY, it)
+                    }
+                )
+            }
+            item {
+                SwitchPreference(
+                    title = stringResource(R.string.show_disabled_apps),
+                    summary = stringResource(
+                        if (showDisabledApps) R.string.show_disabled_apps_on
+                        else R.string.show_disabled_apps_off
+                    ),
+                    checked = showDisabledApps,
+                    onCheckedChange = {
+                        showDisabledApps = it
+                        ApplicationPreferences.put(ApplicationPreferences.SHOW_DISABLED_APPS_KEY, it)
                     }
                 )
             }

@@ -25,6 +25,10 @@
     <string name="sort_updated_apps_first_on">Sort apps using his label, but apps that has been updated recently are shown first</string>
     <string name="sort_updated_apps_first_off">Sort apps using his label</string>
 
+    <string name="show_disabled_apps">Show disabled apps</string>
+    <string name="show_disabled_apps_on">Disabled apps will be included in the apps list and in automatic backups</string>
+    <string name="show_disabled_apps_off">Disabled apps will not be included in the apps list nor in automatic backups</string>
+
     <string name="storage">Storage</string>
 
     <string name="save_folder">Save folder</string>

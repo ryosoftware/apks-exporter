@@ -25,6 +25,10 @@
     <string name="sort_updated_apps_first_on">Ordena las apps por su nombre, pero muestra primero las que han sido actualizadas recientemente</string>
     <string name="sort_updated_apps_first_off">Ordena las apps por su nombre</string>
 
+    <string name="show_disabled_apps">Mostrar apps inhabilitadas</string>
+    <string name="show_disabled_apps_on">Las apps inhabilitadas se incluirán en la lista y en los backups automáticos</string>
+    <string name="show_disabled_apps_off">Las apps inhabilitadas no se incluirán en la lista ni en los backups automáticos</string>
+
     <string name="storage">Almacenamiento</string>
 
     <string name="save_folder">Directorio de la app</string>

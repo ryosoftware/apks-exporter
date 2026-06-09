@@ -16,5 +16,6 @@
     <string name="theme_default">system</string>
     <string name="black_background_default">false</string>
     <string name="use_system_accent_color_default">false</string>
+    <string name="show_disabled_apps_default">true</string>
 
 </resources>
