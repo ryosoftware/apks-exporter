@@ -9,6 +9,7 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.os.Process
 import android.provider.Settings
+import android.os.PowerManager
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -260,6 +261,10 @@ fun PreferencesScreen(onNavigateBack: () -> Unit) {
         ActivityResultContracts.RequestPermission()
     ) { }
 
+    val batteryOptimizationLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { }
+
     fun setAutoBackupApps(newValue: Boolean, uri: Uri? = null) {
         autoBackupApps = newValue
         val hasFolder = ((uri != null) || (saveFolderUriFlow != null))
@@ -274,6 +279,13 @@ fun PreferencesScreen(onNavigateBack: () -> Unit) {
         if (newValue) {
             if (!PermissionUtilities.permissionGranted(context, Manifest.permission.POST_NOTIFICATIONS)) {
                 permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+            val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+            if (!powerManager.isIgnoringBatteryOptimizations(context.packageName)) {
+                val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                    data = Uri.parse("package:${context.packageName}")
+                }
+                batteryOptimizationLauncher.launch(intent)
             }
         }
     }

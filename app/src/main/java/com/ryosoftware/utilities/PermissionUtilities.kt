@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import android.os.PowerManager
 import android.provider.Settings
 
 object PermissionUtilities {
@@ -33,6 +34,11 @@ object PermissionUtilities {
         } else {
             requestPermissions(activity, arrayOf(requestedPermission), requestCode)
         }
+    }
+
+    fun isBatteryOptimizationIgnored(context: Context): Boolean {
+        val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+        return powerManager.isIgnoringBatteryOptimizations(context.packageName)
     }
 
     fun permissionGranted(context: Context, permission: String): Boolean {

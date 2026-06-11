@@ -252,6 +252,7 @@ class MainBackupWorker @AssistedInject constructor(
 
             val request = OneTimeWorkRequestBuilder<MainBackupWorker>()
                 .setInitialDelay(nextExecutionTime, TimeUnit.MILLISECONDS)
+                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 .addTag(AUTO_BACKUP_APPS_WORKER_TAG)
                 .build()
             WorkManager.getInstance(context).enqueueUniqueWork(
