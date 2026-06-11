@@ -280,8 +280,7 @@ fun PreferencesScreen(onNavigateBack: () -> Unit) {
             if (!PermissionUtilities.permissionGranted(context, Manifest.permission.POST_NOTIFICATIONS)) {
                 permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
-            val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-            if (!powerManager.isIgnoringBatteryOptimizations(context.packageName)) {
+            if (!PermissionUtilities.isBatteryOptimizationIgnored(context)) {
                 val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
                     data = Uri.parse("package:${context.packageName}")
                 }
