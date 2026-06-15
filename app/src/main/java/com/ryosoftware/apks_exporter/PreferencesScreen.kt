@@ -1,6 +1,7 @@
 package com.ryosoftware.apks_exporter
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.AppOpsManager
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -265,6 +266,7 @@ fun PreferencesScreen(onNavigateBack: () -> Unit) {
         ActivityResultContracts.StartActivityForResult()
     ) { }
 
+    @SuppressLint("BatteryLife")
     fun setAutoBackupApps(newValue: Boolean, uri: Uri? = null) {
         autoBackupApps = newValue
         val hasFolder = ((uri != null) || (saveFolderUriFlow != null))
@@ -282,7 +284,7 @@ fun PreferencesScreen(onNavigateBack: () -> Unit) {
             }
             if (!PermissionUtilities.isBatteryOptimizationIgnored(context)) {
                 val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
-                    data = Uri.parse("package:${context.packageName}")
+                    data = "package:${context.packageName}".toUri()
                 }
                 batteryOptimizationLauncher.launch(intent)
             }

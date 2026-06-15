@@ -203,4 +203,7 @@
     <string name="backup_warning_continue">No, continue</string>
     <string name="backup_warning_continue_editing">Continue editing</string>
 
+    <string name="battery_optimization_dialog_title">Disable battery optimization</string>
+    <string name="battery_optimization_dialog_message">For automatic backups to run on time, even when the device is in sleep mode, battery optimization must be disabled for this app.\n\nThis will not significantly affect your device\'s battery life.</string>
+
 </resources>

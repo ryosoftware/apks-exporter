@@ -204,4 +204,7 @@
     <string name="backup_warning_continue">No, continuar</string>
     <string name="backup_warning_continue_editing">Seguir editando</string>
 
+    <string name="battery_optimization_dialog_title">Desactivar optimización de batería</string>
+    <string name="battery_optimization_dialog_message">Para que las copias de seguridad automáticas se ejecuten a tiempo, incluso cuando el dispositivo esté en modo reposo, es necesario desactivar la optimización de batería para esta app.\n\nEsto no afectará significativamente a la duración de la batería de tu dispositivo.</string>
+
 </resources>

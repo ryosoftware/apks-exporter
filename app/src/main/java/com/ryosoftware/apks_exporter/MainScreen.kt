@@ -43,7 +43,6 @@ import com.ryosoftware.apks_exporter.main_activity.InstallAppTask
 import com.ryosoftware.utilities.PermissionUtilities
 import com.ryosoftware.utilities.StatusBarUtilities
 import kotlinx.coroutines.launch
-import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,6 +76,14 @@ fun MainScreen(
         ApplicationPreferences.AUTO_BACKUP_APPS_DEFAULT
     )
 
+    var showBatteryOptimizationDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        if (autoBackupEnabled && !PermissionUtilities.isBatteryOptimizationIgnored(context)) {
+            showBatteryOptimizationDialog = true
+        }
+    }
+
     val installPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { _ ->
@@ -88,6 +95,10 @@ fun MainScreen(
             }
         }
     }
+
+    val batteryOptimizationLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { }
 
     val apkFilePickerLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument()
@@ -414,6 +425,30 @@ fun MainScreen(
             confirmButton = {
                 TextButton(onClick = { showNoFolderDialog = false }) {
                     Text(stringResource(R.string.accept_button))
+                }
+            }
+        )
+    }
+
+    if (showBatteryOptimizationDialog) {
+        AlertDialog(
+            onDismissRequest = { showBatteryOptimizationDialog = false },
+            title = { Text(stringResource(R.string.battery_optimization_dialog_title)) },
+            text = { Text(stringResource(R.string.battery_optimization_dialog_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showBatteryOptimizationDialog = false
+                    val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                        data = "package:${context.packageName}".toUri()
+                    }
+                    batteryOptimizationLauncher.launch(intent)
+                }) {
+                    Text(stringResource(R.string.accept_button))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showBatteryOptimizationDialog = false }) {
+                    Text(stringResource(R.string.cancel_button))
                 }
             }
         )
