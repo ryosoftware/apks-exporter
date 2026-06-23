@@ -15,8 +15,8 @@ android {
 
     defaultConfig {
         applicationId "com.ryosoftware.apks_exporter"
-        versionCode 200001005
-        versionName "2.1.5"
+        versionCode 200001006
+        versionName "2.1.6"
 
         minSdkVersion 33
         targetSdkVersion 37
@@ -47,6 +47,14 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
     }
 }
 
