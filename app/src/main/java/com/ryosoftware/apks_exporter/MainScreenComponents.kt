@@ -3,6 +3,8 @@ package com.ryosoftware.apks_exporter
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -472,6 +474,22 @@ fun AppCard(
     var autoBackupApp by remember { mutableStateOf(autoBackupFlow) }
     LaunchedEffect(autoBackupFlow) { autoBackupApp = autoBackupFlow }
 
+    val blackBackground by ApplicationPreferences.observe(
+        ApplicationPreferences.BLACK_BACKGROUND_KEY,
+        ApplicationPreferences.BLACK_BACKGROUND_DEFAULT
+    ).collectAsStateWithLifecycle(
+        initialValue = ApplicationPreferences.get(
+            ApplicationPreferences.BLACK_BACKGROUND_KEY,
+            ApplicationPreferences.BLACK_BACKGROUND_DEFAULT
+        )
+    )
+
+    val cardBorder = if (blackBackground && isSystemInDarkTheme()) {
+        BorderStroke(1.dp, Color(0xFF444444))
+    } else {
+        null
+    }
+
     val badgeContainer = if (isSelected)
         MaterialTheme.colorScheme.onPrimaryContainer
     else
@@ -491,12 +509,12 @@ fun AppCard(
                 onLongClick = onLongClick
             ),
         shape = RoundedCornerShape(12.dp),
+        border = cardBorder,
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isSelected)
-                MaterialTheme.colorScheme.primaryContainer
-            else
-                MaterialTheme.colorScheme.surface
+            containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer
+                             else if (blackBackground && isSystemInDarkTheme()) MaterialTheme.colorScheme.surface
+                             else MaterialTheme.colorScheme.surfaceContainer
         )
     ) {
         Row(
@@ -505,7 +523,9 @@ fun AppCard(
                 .padding(12.dp),
             verticalAlignment = Alignment.Top
         ) {
-            Box(modifier = Modifier.size(50.dp).clip(CircleShape)) {
+            Box(modifier = Modifier
+                .size(50.dp)
+                .clip(CircleShape)) {
                 if (item.icon != null) {
                     Image(
                         painter = rememberDrawablePainter(item.icon),
@@ -571,6 +591,7 @@ fun AppCard(
                     )
                 }
                 FlowRow(
+                    modifier = Modifier.padding(top = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
