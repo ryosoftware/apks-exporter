@@ -9,6 +9,9 @@
 
 # Add any project specific keep options here:
 
+# R8: Hilt/Dagger references Error Prone annotations at compile time only
+-dontwarn com.google.errorprone.annotations.CanIgnoreReturnValue
+
 # If your project uses WebView with JS, uncomment the following
 # and specify the fully qualified class name to the JavaScript interface
 # class:
