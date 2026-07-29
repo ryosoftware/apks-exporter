@@ -27,16 +27,6 @@ android {
                 "TAG",
                 "\"APKsExporter\""
         )
-        buildConfigField(
-                "String",
-                "versionName",
-                "\"${versionName}\""
-        )
-        buildConfigField(
-                "String",
-                "versionCode",
-                "\"${versionCode}\""
-        )
     }
 
     buildFeatures {

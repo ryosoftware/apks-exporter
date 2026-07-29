@@ -101,7 +101,6 @@
     <string name="github_repo_summary">Click to browse the app\'s source code, including the License agreement.</string>
 
     <string name="app_version_name">App Version</string>
-    <string name="app_version_name_summary">%1$s (%2$s)</string>
     <string name="app_version_name_and_number">%1$s (%2$d)</string>
 
     <string name="install_app">Install app</string>

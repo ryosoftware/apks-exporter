@@ -658,7 +658,7 @@ fun PreferencesScreen(onNavigateBack: () -> Unit) {
                     )
                     InfoPreference(
                         title = stringResource(R.string.app_version_name),
-                        summary = stringResource(R.string.app_version_name_summary, BuildConfig.versionName, BuildConfig.versionCode)
+                        summary = stringResource(R.string.app_version_name_and_number, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
                     )
                 }
             }

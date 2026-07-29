@@ -29,7 +29,7 @@ class Main : Application(), Configuration.Provider, Thread.UncaughtExceptionHand
         super.onCreate()
         LogUtilities.tag = BuildConfig.TAG
         LogUtilities.logMode = LogUtilities.DEBUG_ERRORS
-        LogUtilities.show(this, "Application started (current app version is ${BuildConfig.versionName} (${BuildConfig.versionCode}))")
+        LogUtilities.show(this, "Application started (current app version is ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}))")
         ApplicationPreferences.initialize()
         createNotificationsChannels()
         Thread.setDefaultUncaughtExceptionHandler(this)
