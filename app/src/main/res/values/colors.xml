@@ -20,4 +20,15 @@
     <color name="secondary">#FFEF9144</color>
     <color name="on_secondary">@color/white</color>
 
+    <color name="tertiary">#FF006B6B</color>
+    <color name="on_tertiary">@color/white</color>
+    
+    <color name="tertiary_container">#FFB2DFDF</color>
+    <color name="on_tertiary_container">#FF002020</color>
+
+    <color name="surface_tint">#FFEF6C00</color>
+
+    <color name="outline">#FF7A5540</color>
+    <color name="outline_variant">#FFE0D0C8</color>
+
 </resources>

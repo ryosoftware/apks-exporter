@@ -18,23 +18,24 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.documentfile.provider.DocumentFile
 import com.ryosoftware.utilities.PermissionUtilities
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -207,13 +208,24 @@ fun PreferencesScreen(onNavigateBack: () -> Unit) {
     if (showBackupWarningDialog) {
         AlertDialog(
             onDismissRequest = { showBackupWarningDialog = false },
-            title = { Text(stringResource(R.string.backup_warning_title)) },
+            shape = MaterialTheme.shapes.large,
+            title = {
+                Text(
+                    stringResource(R.string.backup_warning_title),
+                    style = MaterialTheme.typography.headlineSmall
+                )
+            },
             text = {
-                Column {
-                    Text(stringResource(R.string.backup_warning_message))
-                    Spacer(modifier = Modifier.height(12.dp))
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text(
+                        stringResource(R.string.backup_warning_message),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                     TextButton(onClick = { showBackupWarningDialog = false }) {
-                        Text(stringResource(R.string.backup_warning_continue_editing))
+                        Text(
+                            stringResource(R.string.backup_warning_continue_editing),
+                            style = MaterialTheme.typography.labelLarge
+                        )
                     }
                 }
             },
@@ -223,7 +235,10 @@ fun PreferencesScreen(onNavigateBack: () -> Unit) {
                     showBackupWarningDialog = false
                     onNavigateBack()
                 }) {
-                    Text(stringResource(R.string.backup_warning_skip))
+                    Text(
+                        stringResource(R.string.backup_warning_skip),
+                        style = MaterialTheme.typography.labelLarge
+                    )
                 }
             },
             dismissButton = {
@@ -231,7 +246,10 @@ fun PreferencesScreen(onNavigateBack: () -> Unit) {
                     showBackupWarningDialog = false
                     onNavigateBack()
                 }) {
-                    Text(stringResource(R.string.backup_warning_continue))
+                    Text(
+                        stringResource(R.string.backup_warning_continue),
+                        style = MaterialTheme.typography.labelLarge
+                    )
                 }
             }
         )
@@ -298,7 +316,12 @@ fun PreferencesScreen(onNavigateBack: () -> Unit) {
 
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.settings)) },
+                title = {
+                    Text(
+                        stringResource(R.string.settings),
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = ::handleBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
@@ -317,336 +340,343 @@ fun PreferencesScreen(onNavigateBack: () -> Unit) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            contentPadding = PaddingValues(vertical = 8.dp)
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
                 SectionHeader(stringResource(R.string.apps_list))
             }
             item {
-                SwitchPreference(
-                    title = stringResource(R.string.show_system_apps),
-                    summary = stringResource(
-                        if (showSystemPackages) R.string.show_system_apps_on
-                        else R.string.show_system_apps_off
-                    ),
-                    checked = showSystemPackages,
-                    onCheckedChange = {
-                        showSystemPackages = it
-                        ApplicationPreferences.put(ApplicationPreferences.SHOW_SYSTEM_PACKAGES_KEY, it)
-                    }
-                )
-            }
-            item {
-                SwitchPreference(
-                    title = stringResource(R.string.show_system_apps_only_if_updated),
-                    summary = stringResource(
-                        if (showSystemPackagesOnlyIfUpdated) R.string.show_system_apps_only_if_updated_on
-                        else R.string.show_system_apps_only_if_updated_off
-                    ),
-                    checked = showSystemPackagesOnlyIfUpdated,
-                    enabled = showSystemPackages,
-                    onCheckedChange = {
-                        showSystemPackagesOnlyIfUpdated = it
-                        ApplicationPreferences.put(ApplicationPreferences.SHOW_SYSTEM_PACKAGES_ONLY_IF_UPDATED_KEY, it)
-                    }
-                )
-            }
-            item {
-                SwitchPreference(
-                    title = stringResource(R.string.show_disabled_apps),
-                    summary = stringResource(
-                        if (showDisabledApps) R.string.show_disabled_apps_on
-                        else R.string.show_disabled_apps_off
-                    ),
-                    checked = showDisabledApps,
-                    onCheckedChange = {
-                        showDisabledApps = it
-                        ApplicationPreferences.put(ApplicationPreferences.SHOW_DISABLED_APPS_KEY, it)
-                    }
-                )
-            }
-            item {
-                SwitchPreference(
-                    title = stringResource(R.string.sort_updated_apps_first),
-                    summary = stringResource(
-                        if (sortUpdatedAppsFirst) R.string.sort_updated_apps_first_on
-                        else R.string.sort_updated_apps_first_off
-                    ),
-                    checked = sortUpdatedAppsFirst,
-                    onCheckedChange = {
-                        sortUpdatedAppsFirst = it
-                        ApplicationPreferences.put(ApplicationPreferences.SORT_UPDATED_APPS_FIRST_KEY, it)
-                    }
-                )
+                SettingsCard {
+                    SwitchPreference(
+                        title = stringResource(R.string.show_system_apps),
+                        summary = stringResource(
+                            if (showSystemPackages) R.string.show_system_apps_on
+                            else R.string.show_system_apps_off
+                        ),
+                        checked = showSystemPackages,
+                        onCheckedChange = {
+                            showSystemPackages = it
+                            ApplicationPreferences.put(ApplicationPreferences.SHOW_SYSTEM_PACKAGES_KEY, it)
+                        }
+                    )
+                    SwitchPreference(
+                        title = stringResource(R.string.show_system_apps_only_if_updated),
+                        summary = stringResource(
+                            if (showSystemPackagesOnlyIfUpdated) R.string.show_system_apps_only_if_updated_on
+                            else R.string.show_system_apps_only_if_updated_off
+                        ),
+                        checked = showSystemPackagesOnlyIfUpdated,
+                        enabled = showSystemPackages,
+                        onCheckedChange = {
+                            showSystemPackagesOnlyIfUpdated = it
+                            ApplicationPreferences.put(ApplicationPreferences.SHOW_SYSTEM_PACKAGES_ONLY_IF_UPDATED_KEY, it)
+                        }
+                    )
+                    SwitchPreference(
+                        title = stringResource(R.string.show_disabled_apps),
+                        summary = stringResource(
+                            if (showDisabledApps) R.string.show_disabled_apps_on
+                            else R.string.show_disabled_apps_off
+                        ),
+                        checked = showDisabledApps,
+                        onCheckedChange = {
+                            showDisabledApps = it
+                            ApplicationPreferences.put(ApplicationPreferences.SHOW_DISABLED_APPS_KEY, it)
+                        }
+                    )
+                    SwitchPreference(
+                        title = stringResource(R.string.sort_updated_apps_first),
+                        summary = stringResource(
+                            if (sortUpdatedAppsFirst) R.string.sort_updated_apps_first_on
+                            else R.string.sort_updated_apps_first_off
+                        ),
+                        checked = sortUpdatedAppsFirst,
+                        onCheckedChange = {
+                            sortUpdatedAppsFirst = it
+                            ApplicationPreferences.put(ApplicationPreferences.SORT_UPDATED_APPS_FIRST_KEY, it)
+                        }
+                    )
+                }
             }
 
             item {
                 SectionHeader(stringResource(R.string.storage))
             }
             item {
-                ClickablePreference(
-                    title = stringResource(R.string.save_folder),
-                    summary = saveFolderName ?: stringResource(R.string.save_folder_not_set),
-                    onClick = { launchFolderPicker(saveFolderUriFlow?.toUri()) }
-                )
+                SettingsCard {
+                    ClickablePreference(
+                        title = stringResource(R.string.save_folder),
+                        summary = saveFolderName ?: stringResource(R.string.save_folder_not_set),
+                        onClick = { launchFolderPicker(saveFolderUriFlow?.toUri()) }
+                    )
+                }
             }
 
             item {
                 SectionHeader(stringResource(R.string.backup_format))
             }
             item {
-                SwitchPreference(
-                    title = stringResource(R.string.use_app_label),
-                    summary = stringResource(
-                        if (useAppLabel) R.string.use_app_label_on
-                        else R.string.use_app_label_off
-                    ),
-                    checked = useAppLabel,
-                    onCheckedChange = {
-                        useAppLabel = it
-                        ApplicationPreferences.put(ApplicationPreferences.USE_APP_LABEL_KEY, it)
-                    }
-                )
-            }
-            item {
-                SwitchPreference(
-                    title = stringResource(R.string.use_long_version_number),
-                    summary = stringResource(
-                        if (useLongVersionNumber) R.string.use_long_version_number_on
-                        else R.string.use_long_version_number_off
-                    ),
-                    checked = useLongVersionNumber,
-                    onCheckedChange = {
-                        useLongVersionNumber = it
-                        ApplicationPreferences.put(ApplicationPreferences.USE_LONG_VERSION_NUMBER_KEY, it)
-                    }
-                )
-            }
-            item {
-                SwitchPreference(
-                    title = stringResource(R.string.save_as_zip_file),
-                    summary = stringResource(
-                        if (saveAsZipFile) R.string.save_as_zip_file_on
-                        else R.string.save_as_zip_file_off
-                    ),
-                    checked = saveAsZipFile,
-                    onCheckedChange = {
-                        saveAsZipFile = it
-                        ApplicationPreferences.put(ApplicationPreferences.SAVE_AS_ZIP_FILE_KEY, it)
-                    }
-                )
-            }
-            item {
-                SwitchPreference(
-                    title = stringResource(R.string.apkm_extension),
-                    summary = stringResource(
-                        if (useApkmExtension) R.string.apkm_extension_on
-                        else R.string.apkm_extension_off
-                    ),
-                    checked = useApkmExtension,
-                    enabled = saveAsZipFile,
-                    onCheckedChange = {
-                        useApkmExtension = it
-                        ApplicationPreferences.put(ApplicationPreferences.APKM_EXTENSION_KEY, it)
-                    }
-                )
-            }
-            item {
-                SwitchPreference(
-                    title = stringResource(R.string.do_not_compress_single_files),
-                    summary = stringResource(
-                        if (doNotCompressSingleFiles) R.string.do_not_compress_single_files_on
-                        else R.string.do_not_compress_single_files_off
-                    ),
-                    checked = doNotCompressSingleFiles,
-                    enabled = saveAsZipFile,
-                    onCheckedChange = {
-                        doNotCompressSingleFiles = it
-                        ApplicationPreferences.put(ApplicationPreferences.DO_NOT_COMPRESS_SINGLE_FILES_KEY, it)
-                    }
-                )
+                SettingsCard {
+                    SwitchPreference(
+                        title = stringResource(R.string.use_app_label),
+                        summary = stringResource(
+                            if (useAppLabel) R.string.use_app_label_on
+                            else R.string.use_app_label_off
+                        ),
+                        checked = useAppLabel,
+                        onCheckedChange = {
+                            useAppLabel = it
+                            ApplicationPreferences.put(ApplicationPreferences.USE_APP_LABEL_KEY, it)
+                        }
+                    )
+                    SwitchPreference(
+                        title = stringResource(R.string.use_long_version_number),
+                        summary = stringResource(
+                            if (useLongVersionNumber) R.string.use_long_version_number_on
+                            else R.string.use_long_version_number_off
+                        ),
+                        checked = useLongVersionNumber,
+                        onCheckedChange = {
+                            useLongVersionNumber = it
+                            ApplicationPreferences.put(ApplicationPreferences.USE_LONG_VERSION_NUMBER_KEY, it)
+                        }
+                    )
+                    SwitchPreference(
+                        title = stringResource(R.string.save_as_zip_file),
+                        summary = stringResource(
+                            if (saveAsZipFile) R.string.save_as_zip_file_on
+                            else R.string.save_as_zip_file_off
+                        ),
+                        checked = saveAsZipFile,
+                        onCheckedChange = {
+                            saveAsZipFile = it
+                            ApplicationPreferences.put(ApplicationPreferences.SAVE_AS_ZIP_FILE_KEY, it)
+                        }
+                    )
+                    SwitchPreference(
+                        title = stringResource(R.string.apkm_extension),
+                        summary = stringResource(
+                            if (useApkmExtension) R.string.apkm_extension_on
+                            else R.string.apkm_extension_off
+                        ),
+                        checked = useApkmExtension,
+                        enabled = saveAsZipFile,
+                        onCheckedChange = {
+                            useApkmExtension = it
+                            ApplicationPreferences.put(ApplicationPreferences.APKM_EXTENSION_KEY, it)
+                        }
+                    )
+                    SwitchPreference(
+                        title = stringResource(R.string.do_not_compress_single_files),
+                        summary = stringResource(
+                            if (doNotCompressSingleFiles) R.string.do_not_compress_single_files_on
+                            else R.string.do_not_compress_single_files_off
+                        ),
+                        checked = doNotCompressSingleFiles,
+                        enabled = saveAsZipFile,
+                        onCheckedChange = {
+                            doNotCompressSingleFiles = it
+                            ApplicationPreferences.put(ApplicationPreferences.DO_NOT_COMPRESS_SINGLE_FILES_KEY, it)
+                        }
+                    )
+                }
             }
 
             item {
                 SectionHeader(stringResource(R.string.automation))
             }
             item {
-                SwitchPreference(
-                    title = stringResource(R.string.auto_backup_apps),
-                    summary = stringResource(
-                        if (autoBackupApps) R.string.auto_backup_apps_on
-                        else R.string.auto_backup_apps_off
-                    ),
-                    checked = autoBackupApps,
-                    enabled = true,
-                    onCheckedChange = ::setAutoBackupApps
-                )
-            }
-            item {
-                SwitchPreference(
-                    title = stringResource(R.string.auto_enable_new_apps),
-                    summary = stringResource(
-                        if (autoBackupForNewApps) R.string.auto_enable_new_apps_on
-                        else R.string.auto_enable_new_apps_off
-                    ),
-                    checked = autoBackupForNewApps,
-                    enabled = autoBackupApps,
-                    onCheckedChange = {
-                        autoBackupForNewApps = it
-                        ApplicationPreferences.put(ApplicationPreferences.AUTO_BACKUP_NEW_APPS_KEY, it)
-                    }
-                )
-            }
-            item {
-                ClickablePreference(
-                    title = stringResource(R.string.force_backup_now),
-                    summary = if (isBackupRunning) {
-                        stringResource(R.string.force_backup_running)
-                    } else buildString {
-                        val lastBackupTime = ApplicationPreferences.get(ApplicationPreferences.LAST_AUTO_BACKUP_TIME_KEY, 0L)
-                        val nextBackupTime = ApplicationPreferences.get(ApplicationPreferences.NEXT_AUTO_BACKUP_TIME_KEY, 0L)
-                        if (lastBackupTime > 0) {
-                            val lastBackupResult = ApplicationPreferences.get<String?>(ApplicationPreferences.LAST_BACKUP_RESULTS_KEY, null)
-                            append(
-                                stringResource(
-                                    R.string.auto_backup_last_date,
-                                    java.time.Instant.ofEpochMilli(lastBackupTime)
-                                        .atZone(java.time.ZoneId.systemDefault())
-                                        .toLocalDateTime()
-                                        .format(
-                                            java.time.format.DateTimeFormatter.ofPattern(
-                                                stringResource(R.string.auto_backup_last_date_format)
+                SettingsCard {
+                    SwitchPreference(
+                        title = stringResource(R.string.auto_backup_apps),
+                        summary = stringResource(
+                            if (autoBackupApps) R.string.auto_backup_apps_on
+                            else R.string.auto_backup_apps_off
+                        ),
+                        checked = autoBackupApps,
+                        enabled = true,
+                        onCheckedChange = ::setAutoBackupApps
+                    )
+                    SwitchPreference(
+                        title = stringResource(R.string.auto_enable_new_apps),
+                        summary = stringResource(
+                            if (autoBackupForNewApps) R.string.auto_enable_new_apps_on
+                            else R.string.auto_enable_new_apps_off
+                        ),
+                        checked = autoBackupForNewApps,
+                        enabled = autoBackupApps,
+                        onCheckedChange = {
+                            autoBackupForNewApps = it
+                            ApplicationPreferences.put(ApplicationPreferences.AUTO_BACKUP_NEW_APPS_KEY, it)
+                        }
+                    )
+                    ClickablePreference(
+                        title = stringResource(R.string.force_backup_now),
+                        summary = if (isBackupRunning) {
+                            stringResource(R.string.force_backup_running)
+                        } else buildString {
+                            val lastBackupTime = ApplicationPreferences.get(ApplicationPreferences.LAST_AUTO_BACKUP_TIME_KEY, 0L)
+                            val nextBackupTime = ApplicationPreferences.get(ApplicationPreferences.NEXT_AUTO_BACKUP_TIME_KEY, 0L)
+                            if (lastBackupTime > 0) {
+                                val lastBackupResult = ApplicationPreferences.get<String?>(ApplicationPreferences.LAST_BACKUP_RESULTS_KEY, null)
+                                append(
+                                    stringResource(
+                                        R.string.auto_backup_last_date,
+                                        java.time.Instant.ofEpochMilli(lastBackupTime)
+                                            .atZone(java.time.ZoneId.systemDefault())
+                                            .toLocalDateTime()
+                                            .format(
+                                                java.time.format.DateTimeFormatter.ofPattern(
+                                                    stringResource(R.string.auto_backup_last_date_format)
+                                                )
                                             )
-                                        )
+                                    )
                                 )
-                            )
-                            append("\n")
-                            if (!lastBackupResult.isNullOrEmpty()) {
-                                append(lastBackupResult)
+                                append("\n")
+                                if (!lastBackupResult.isNullOrEmpty()) {
+                                    append(lastBackupResult)
+                                    append("\n")
+                                }
                                 append("\n")
                             }
-                            append("\n")
-                        }
-                        if (nextBackupTime > 0) {
-                            append(
-                                stringResource(
-                                    R.string.auto_backup_next_date,
-                                    java.time.Instant.ofEpochMilli(nextBackupTime)
-                                        .atZone(java.time.ZoneId.systemDefault())
-                                        .toLocalDateTime()
-                                        .format(
-                                            java.time.format.DateTimeFormatter.ofPattern(
-                                                stringResource(R.string.auto_backup_last_date_format)
+                            if (nextBackupTime > 0) {
+                                append(
+                                    stringResource(
+                                        R.string.auto_backup_next_date,
+                                        java.time.Instant.ofEpochMilli(nextBackupTime)
+                                            .atZone(java.time.ZoneId.systemDefault())
+                                            .toLocalDateTime()
+                                            .format(
+                                                java.time.format.DateTimeFormatter.ofPattern(
+                                                    stringResource(R.string.auto_backup_last_date_format)
+                                                )
                                             )
-                                        )
+                                    )
                                 )
-                            )
-                            append("\n\n")
+                                append("\n\n")
+                            }
+                            append(stringResource(R.string.force_backup_now_summary))
+                        },
+                        enabled = autoBackupApps && (!isBackupRunning),
+                        onClick = {
+                            isBackupRunning = true
+                            MainBackupWorker.onBackupForced(context)
                         }
-                        append(stringResource(R.string.force_backup_now_summary))
-                    },
-                    enabled = autoBackupApps && (!isBackupRunning),
-                    onClick = {
-                        isBackupRunning = true
-                        MainBackupWorker.onBackupForced(context)
-                    }
-                )
+                    )
+                }
             }
 
             item {
                 SectionHeader(stringResource(R.string.appearance))
             }
             item {
-                SettingsDropdownPreference(
-                    title = stringResource(R.string.theme),
-                    options = listOf(
-                        ApplicationPreferences.THEME_DARK to stringResource(R.string.dark_theme),
-                        ApplicationPreferences.THEME_LIGHT to stringResource(R.string.light_theme),
-                        ApplicationPreferences.THEME_SYSTEM to stringResource(R.string.system_theme)
-                    ),
-                    selected = theme,
-                    onSelected = { newValue ->
-                        theme = newValue
-                        ApplicationPreferences.put(
-                            ApplicationPreferences.THEME_KEY,
-                            newValue
-                        )
-                    }
-                )
+                SettingsCard {
+                    SettingsDropdownPreference(
+                        title = stringResource(R.string.theme),
+                        options = listOf(
+                            ApplicationPreferences.THEME_DARK to stringResource(R.string.dark_theme),
+                            ApplicationPreferences.THEME_LIGHT to stringResource(R.string.light_theme),
+                            ApplicationPreferences.THEME_SYSTEM to stringResource(R.string.system_theme)
+                        ),
+                        selected = theme,
+                        onSelected = { newValue ->
+                            theme = newValue
+                            ApplicationPreferences.put(
+                                ApplicationPreferences.THEME_KEY,
+                                newValue
+                            )
+                        }
+                    )
+                }
             }
             item {
-                SwitchPreference(
-                    title = stringResource(R.string.black_background),
-                    summary = stringResource(
-                        if (blackBackground) R.string.black_background_on
-                        else R.string.black_background_off
-                    ),
-                    checked = blackBackground,
-                    enabled = (theme == ApplicationPreferences.THEME_DARK) || ((theme == ApplicationPreferences.THEME_SYSTEM) && isSystemInDarkTheme()),
-                    onCheckedChange = { newValue ->
-                        blackBackground = newValue
-                        ApplicationPreferences.put(ApplicationPreferences.BLACK_BACKGROUND_KEY, newValue)
-                    }
-                )
-            }
-            item {
-                SwitchPreference(
-                    title = stringResource(R.string.use_system_accent_color),
-                    summary = stringResource(
-                        if (useSystemAccentColor) R.string.use_system_accent_color_on
-                        else R.string.use_system_accent_color_off
-                    ),
-                    checked = useSystemAccentColor,
-                    onCheckedChange = { newValue ->
-                        useSystemAccentColor = newValue
-                        ApplicationPreferences.put(ApplicationPreferences.USE_SYSTEM_ACCENT_COLOR_KEY, newValue)
-                    }
-                )
+                SettingsCard {
+                    SwitchPreference(
+                        title = stringResource(R.string.black_background),
+                        summary = stringResource(
+                            if (blackBackground) R.string.black_background_on
+                            else R.string.black_background_off
+                        ),
+                        checked = blackBackground,
+                        enabled = (theme == ApplicationPreferences.THEME_DARK) || ((theme == ApplicationPreferences.THEME_SYSTEM) && isSystemInDarkTheme()),
+                        onCheckedChange = { newValue ->
+                            blackBackground = newValue
+                            ApplicationPreferences.put(ApplicationPreferences.BLACK_BACKGROUND_KEY, newValue)
+                        }
+                    )
+                    SwitchPreference(
+                        title = stringResource(R.string.use_system_accent_color),
+                        summary = stringResource(
+                            if (useSystemAccentColor) R.string.use_system_accent_color_on
+                            else R.string.use_system_accent_color_off
+                        ),
+                        checked = useSystemAccentColor,
+                        onCheckedChange = { newValue ->
+                            useSystemAccentColor = newValue
+                            ApplicationPreferences.put(ApplicationPreferences.USE_SYSTEM_ACCENT_COLOR_KEY, newValue)
+                        }
+                    )
+                }
             }
 
             item {
                 SectionHeader(stringResource(R.string.permissions_title))
             }
             item {
-                ClickablePreference(
-                    title = stringResource(R.string.usage_access),
-                    summary = stringResource(
-                        if (usageStatsGranted) R.string.usage_access_granted
-                        else R.string.usage_access_not_granted
-                    ),
-                    onClick = {
-                        val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
-                        context.startActivity(intent)
-                    }
-                )
+                SettingsCard {
+                    ClickablePreference(
+                        title = stringResource(R.string.usage_access),
+                        summary = stringResource(
+                            if (usageStatsGranted) R.string.usage_access_granted
+                            else R.string.usage_access_not_granted
+                        ),
+                        onClick = {
+                            val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
+                            context.startActivity(intent)
+                        }
+                    )
+                }
             }
 
             item {
                 SectionHeader(stringResource(R.string.about))
             }
             item {
-                val url = stringResource(R.string.github_repo_link).toUri()
-                ClickablePreference(
-                    title = stringResource(R.string.github_repo),
-                    summary = stringResource(R.string.github_repo_summary),
-                    onClick = {
-                        val intent = Intent(
-                            Intent.ACTION_VIEW,
-                            url
-                        )
-                        context.startActivity(intent)
-                    }
-                )
+                SettingsCard {
+                    val url = stringResource(R.string.github_repo_link).toUri()
+                    ClickablePreference(
+                        title = stringResource(R.string.github_repo),
+                        summary = stringResource(R.string.github_repo_summary),
+                        onClick = {
+                            val intent = Intent(
+                                Intent.ACTION_VIEW,
+                                url
+                            )
+                            context.startActivity(intent)
+                        }
+                    )
+                    InfoPreference(
+                        title = stringResource(R.string.app_version_name),
+                        summary = stringResource(R.string.app_version_name_summary, BuildConfig.versionName, BuildConfig.versionCode)
+                    )
+                }
             }
-            item {
-                InfoPreference(
-                    title = stringResource(R.string.app_version_name),
-                    summary = stringResource(R.string.app_version_name_summary, BuildConfig.versionName, BuildConfig.versionCode)
-                )
-            }
-
             item { Spacer(modifier = Modifier.height(16.dp)) }
         }
+    }
+}
+
+@Composable
+private fun SettingsCard(content: @Composable () -> Unit) {
+    Card(
+        shape = MaterialTheme.shapes.small,
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
+    ) {
+        content()
     }
 }
 
@@ -654,10 +684,10 @@ fun PreferencesScreen(onNavigateBack: () -> Unit) {
 private fun SectionHeader(title: String) {
     Text(
         text = title,
-        style = MaterialTheme.typography.titleSmall,
-        fontWeight = FontWeight.Medium,
-        color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.SemiBold,
+        color = MaterialTheme.colorScheme.tertiary,
+        modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp)
     )
 }
 
@@ -670,8 +700,18 @@ private fun SwitchPreference(
     onCheckedChange: (Boolean) -> Unit
 ) {
     ListItem(
-        headlineContent = { Text(title) },
-        supportingContent = { Text(summary) },
+        headlineContent = {
+            Text(
+                title,
+                style = MaterialTheme.typography.titleSmall
+            )
+        },
+        supportingContent = {
+            Text(
+                summary,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        },
         trailingContent = {
             Switch(checked = checked, onCheckedChange = onCheckedChange, enabled = enabled)
         },
@@ -687,8 +727,18 @@ private fun ClickablePreference(
     onClick: () -> Unit
 ) {
     ListItem(
-        headlineContent = { Text(title) },
-        supportingContent = { Text(summary) },
+        headlineContent = {
+            Text(
+                title,
+                style = MaterialTheme.typography.titleSmall
+            )
+        },
+        supportingContent = {
+            Text(
+                summary,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        },
         modifier = Modifier.clickable(enabled = enabled, onClick = onClick)
     )
 }
@@ -699,8 +749,18 @@ private fun InfoPreference(
     summary: String
 ) {
     ListItem(
-        headlineContent = { Text(title) },
-        supportingContent = { Text(summary) }
+        headlineContent = {
+            Text(
+                title,
+                style = MaterialTheme.typography.titleSmall
+            )
+        },
+        supportingContent = {
+            Text(
+                summary,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
     )
 }
 
@@ -724,7 +784,7 @@ fun SettingsDropdownPreference(
 
         Text(
             text = title,
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.titleSmall
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -743,7 +803,8 @@ fun SettingsDropdownPreference(
                     .fillMaxWidth(),
                 trailingIcon = {
                     ExposedDropdownMenuDefaults.TrailingIcon(expanded)
-                }
+                },
+                shape = MaterialTheme.shapes.small
             )
 
             ExposedDropdownMenu(
@@ -753,7 +814,12 @@ fun SettingsDropdownPreference(
 
                 options.forEach { (value, label) ->
                     DropdownMenuItem(
-                        text = { Text(label) },
+                        text = {
+                            Text(
+                                label,
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        },
                         onClick = {
                             onSelected(value)
                             expanded = false

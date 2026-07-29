@@ -167,6 +167,8 @@
     <string name="search">Search</string>
 
     <string name="loading">Loading</string>
+    <string name="saving">Saving</string>
+    <string name="installing">Installing</string>
 
     <string name="do_not_show_anymore">Do not show anymore</string>
 

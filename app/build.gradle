@@ -16,11 +16,11 @@ android {
     defaultConfig {
         applicationId namespace
 
-        versionCode 200001007
-        versionName "2.1.7"
+        versionCode 200002000
+        versionName "2.2.0"
 
         minSdkVersion 33
-        targetSdkVersion 37
+        targetSdkVersion compileSdk
 
         buildConfigField(
                 "String",

@@ -24,7 +24,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -35,7 +34,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -184,6 +182,7 @@ fun MainScreen(
                         if (doNotShow) {
                             apkFilePickerLauncher.launch(arrayOf(
                                 "application/vnd.android.package-archive",
+                                "application/vnd.apkm",
                                 "application/zip",
                                 "application/octet-stream"
                             ))
@@ -263,11 +262,31 @@ fun MainScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.3f))
+                        .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.4f))
                         .clickable(enabled = false) {},
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                    Surface(
+                        shape = MaterialTheme.shapes.large,
+                        color = MaterialTheme.colorScheme.surface,
+                        tonalElevation = 8.dp
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(32.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            CircularProgressIndicator(
+                                color = MaterialTheme.colorScheme.tertiary,
+                                strokeWidth = 4.dp
+                            )
+                            Text(
+                                text = if (isSaving) stringResource(R.string.saving) else stringResource(R.string.installing),
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -279,7 +298,9 @@ fun MainScreen(
                 showInstallDescription = false
                 apkFilePickerLauncher.launch(arrayOf(
                     "application/vnd.android.package-archive",
-                    "application/zip"
+                    "application/vnd.apkm",
+                    "application/zip",
+                    "application/octet-stream"
                 ))
             },
             onDismiss = { showInstallDescription = false }
@@ -294,7 +315,8 @@ fun MainScreen(
 
         ModalBottomSheet(
             onDismissRequest = { contextMenuItem = null },
-            sheetState = sheetState
+            sheetState = sheetState,
+            shape = MaterialTheme.shapes.extraLarge
         ) {
             Column(
                 modifier = Modifier
@@ -335,13 +357,13 @@ fun MainScreen(
                     } else {
                         pluralStringResource(R.plurals.count_apks_extended, item.apkCount, item.apkCount, sizeToStr(item.apkSize))
                     },
-                    fontSize = 12.sp,
+                    style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 4.dp)
                 )
                 AppContextMenuItem(
                     icon = { Icon(painterResource(R.drawable.ic_actionbar_save_apps), contentDescription = null) },
-                    text = { Text(pluralStringResource(R.plurals.save_app_package, item.apkCount, item.apkCount)) },
+                    text = { Text(pluralStringResource(R.plurals.save_app_package, item.apkCount, item.apkCount), style = MaterialTheme.typography.bodyLarge) },
                     onClick = {
                         contextMenuItem = null
                         scope.launch {
@@ -354,7 +376,7 @@ fun MainScreen(
                 )
                 AppContextMenuItem(
                     icon = { Icon(Icons.Default.Share, contentDescription = null) },
-                    text = { Text(pluralStringResource(R.plurals.share_app_package, item.apkCount, item.apkCount)) },
+                    text = { Text(pluralStringResource(R.plurals.share_app_package, item.apkCount, item.apkCount), style = MaterialTheme.typography.bodyLarge) },
                     onClick = {
                         contextMenuItem = null
                         item.shareApk(activity)
@@ -365,7 +387,8 @@ fun MainScreen(
                         icon = { Icon(Icons.Default.Delete, contentDescription = null) },
                         text = {
                             Text(if (item.isUpdatedSystemApp) stringResource(R.string.uninstall_updates)
-                            else stringResource(R.string.uninstall_app))
+                            else stringResource(R.string.uninstall_app),
+                            style = MaterialTheme.typography.bodyLarge)
                         },
                         onClick = {
                             contextMenuItem = null
@@ -375,7 +398,7 @@ fun MainScreen(
                 }
                 AppContextMenuItem(
                     icon = { Icon(Icons.Default.Settings, contentDescription = null) },
-                    text = { Text(stringResource(R.string.app_info)) },
+                    text = { Text(stringResource(R.string.app_info), style = MaterialTheme.typography.bodyLarge) },
                     onClick = {
                         contextMenuItem = null
                         onNavigateToAppDetail(item.packageName)
@@ -384,7 +407,7 @@ fun MainScreen(
                 if (hasLaunchIntent && (item.packageName != LocalContext.current.packageName)) {
                     AppContextMenuItem(
                         icon = { Icon(painterResource(R.drawable.ic_open_app), contentDescription = null) },
-                        text = { Text(stringResource(R.string.open_app)) },
+                        text = { Text(stringResource(R.string.open_app), style = MaterialTheme.typography.bodyLarge) },
                         onClick = {
                             contextMenuItem = null
                             item.openApp(activity)
@@ -400,11 +423,11 @@ fun MainScreen(
                                 item.canAutomaticallyBackup(!item.canAutomaticallyBackup())
                                 scope.launch { viewModel.loadData() }
                             }
-                            .padding(horizontal = 24.dp, vertical = 8.dp),
+                            .padding(horizontal = 24.dp, vertical = 12.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(stringResource(R.string.can_automatically_backup))
+                        Text(stringResource(R.string.can_automatically_backup), style = MaterialTheme.typography.bodyLarge)
                         Switch(
                             checked = item.canAutomaticallyBackup(),
                             onCheckedChange = {
@@ -420,11 +443,12 @@ fun MainScreen(
     if (showNoFolderDialog) {
         AlertDialog(
             onDismissRequest = { showNoFolderDialog = false },
-            title = { Text(stringResource(R.string.information)) },
-            text = { Text(stringResource(R.string.no_save_folder_selected)) },
+            shape = MaterialTheme.shapes.large,
+            title = { Text(stringResource(R.string.information), style = MaterialTheme.typography.headlineSmall) },
+            text = { Text(stringResource(R.string.no_save_folder_selected), style = MaterialTheme.typography.bodyLarge) },
             confirmButton = {
                 TextButton(onClick = { showNoFolderDialog = false }) {
-                    Text(stringResource(R.string.accept_button))
+                    Text(stringResource(R.string.accept_button), style = MaterialTheme.typography.labelLarge)
                 }
             }
         )
@@ -433,8 +457,9 @@ fun MainScreen(
     if (showBatteryOptimizationDialog) {
         AlertDialog(
             onDismissRequest = { showBatteryOptimizationDialog = false },
-            title = { Text(stringResource(R.string.battery_optimization_dialog_title)) },
-            text = { Text(stringResource(R.string.battery_optimization_dialog_message)) },
+            shape = MaterialTheme.shapes.large,
+            title = { Text(stringResource(R.string.battery_optimization_dialog_title), style = MaterialTheme.typography.headlineSmall) },
+            text = { Text(stringResource(R.string.battery_optimization_dialog_message), style = MaterialTheme.typography.bodyLarge) },
             confirmButton = {
                 TextButton(onClick = {
                     showBatteryOptimizationDialog = false
@@ -443,12 +468,12 @@ fun MainScreen(
                     }
                     batteryOptimizationLauncher.launch(intent)
                 }) {
-                    Text(stringResource(R.string.accept_button))
+                    Text(stringResource(R.string.accept_button), style = MaterialTheme.typography.labelLarge)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showBatteryOptimizationDialog = false }) {
-                    Text(stringResource(R.string.cancel_button))
+                    Text(stringResource(R.string.cancel_button), style = MaterialTheme.typography.labelLarge)
                 }
             }
         )

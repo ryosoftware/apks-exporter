@@ -168,6 +168,8 @@
     <string name="search">Buscar</string>
 
     <string name="loading">Cargando</string>
+    <string name="saving">Guardando</string>
+    <string name="installing">Instalando</string>
 
     <string name="do_not_show_anymore">No volver a mostrar</string>
 

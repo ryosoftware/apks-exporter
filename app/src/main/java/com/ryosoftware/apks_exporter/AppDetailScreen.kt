@@ -1,5 +1,6 @@
 package com.ryosoftware.apks_exporter
 
+import android.annotation.SuppressLint
 import android.app.AppOpsManager
 import android.app.usage.StorageStatsManager
 import android.content.ActivityNotFoundException
@@ -16,6 +17,7 @@ import android.os.storage.StorageManager
 import android.provider.Settings
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,40 +26,41 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.foundation.clickable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 
 import androidx.core.net.toUri
 import com.ryosoftware.utilities.PackageManagerUtilities
@@ -115,7 +118,12 @@ fun AppDetailScreen(packageName: String, onNavigateBack: () -> Unit) {
 
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.app_detail_info)) },
+                title = {
+                    Text(
+                        stringResource(R.string.app_detail_info),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
@@ -140,79 +148,126 @@ fun AppDetailScreen(packageName: String, onNavigateBack: () -> Unit) {
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
             contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             val isDisabled = !(packageInfo.applicationInfo?.enabled ?: false)
             item { HeaderSection(packageInfo, appIcon, isSystemApp, isDisabled) }
-            item { InfoSection(packageInfo, installSource) }
-            item { ApkSection(packageInfo) }
-            item { StorageStatsSection(packageName, packageInfo) }
-            item { SigningSection(packageInfo) }
-            item { ManifestComponentsSection(packageInfo) }
-            val perms = packageInfo.requestedPermissions?.toList() ?: emptyList()
-            if (perms.isNotEmpty()) {
-                item { SectionTitle(stringResource(R.string.permissions)) }
-                items(perms) { perm ->
-                    val name = perm.removePrefix("android.permission.")
-                    Text(name, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
-            item { specialPermissionsSection(packageInfo, perms.toSet()) }
             item {
-                OutlinedButton(
-                    onClick = {
-                        try {
-                            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                                .setData("package:$packageName".toUri())
-                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            context.startActivity(intent)
-                        } catch (e: Exception) {
-                            Toast.makeText(context, R.string.cant_complete_requested_operation, Toast.LENGTH_SHORT).show()
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Text(stringResource(R.string.open_system_app_info))
+                SectionCard {
+                    InfoSection(packageInfo, installSource)
                 }
             }
-            if (isLaunchable) {
+            item {
+                SectionCard {
+                    ApkSection(packageInfo)
+                }
+            }
+
+            if (isUsageStatsGranted(context)) {
                 item {
-                    OutlinedButton(
-                        onClick = {
-                            try {
-                                val intent = pm.getLaunchIntentForPackage(packageName)!!
-                                context.startActivity(intent)
-                            } catch (e: Exception) {
-                                Toast.makeText(context, R.string.cant_complete_requested_operation, Toast.LENGTH_SHORT).show()
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Icon(painterResource(R.drawable.ic_open_app), contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text(stringResource(R.string.open_app))
+                    SectionCard {
+                        StorageStatsSection(packageName, packageInfo)
                     }
                 }
             }
-            if (fromPlayStore) {
+
+            item {
+                SectionCard {
+                    SigningSection(packageInfo)
+                }
+            }
+            item {
+                SectionCard {
+                    ManifestComponentsSection(packageInfo)
+                }
+            }
+            val perms = packageInfo.requestedPermissions?.toList() ?: emptyList()
+            if (perms.isNotEmpty()) {
                 item {
-                    OutlinedButton(
+                    SectionCard {
+                        SectionTitle(stringResource(R.string.permissions))
+                        perms.forEach { perm ->
+                            val name = perm.removePrefix("android.permission.")
+                            Text(
+                                name,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(vertical = 2.dp)
+                            )
+                        }
+                    }
+                }
+            }
+            item {
+                SectionCard {
+                    SpecialPermissionsSection(packageInfo, perms.toSet())
+                }
+            }
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilledTonalButton(
                         onClick = {
                             try {
-                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName"))
-                                context.startActivity(intent)
-                            } catch (_: ActivityNotFoundException) {
-                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$packageName"))
+                                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                                    .setData("package:$packageName".toUri())
+                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                 context.startActivity(intent)
                             } catch (e: Exception) {
                                 Toast.makeText(context, R.string.cant_complete_requested_operation, Toast.LENGTH_SHORT).show()
                             }
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = MaterialTheme.shapes.small
                     ) {
-                        Text(stringResource(R.string.view_in_play_store))
+                        Icon(Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            stringResource(R.string.open_system_app_info),
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    }
+                    if (isLaunchable) {
+                        FilledTonalButton(
+                            onClick = {
+                                try {
+                                    val intent = pm.getLaunchIntentForPackage(packageName)!!
+                                    context.startActivity(intent)
+                                } catch (e: Exception) {
+                                    Toast.makeText(context, R.string.cant_complete_requested_operation, Toast.LENGTH_SHORT).show()
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.small
+                        ) {
+                            Icon(painterResource(R.drawable.ic_open_app), contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                stringResource(R.string.open_app),
+                                style = MaterialTheme.typography.labelLarge
+                            )
+                        }
+                    }
+                    if (fromPlayStore) {
+                        FilledTonalButton(
+                            onClick = {
+                                try {
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName"))
+                                    context.startActivity(intent)
+                                } catch (_: ActivityNotFoundException) {
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$packageName"))
+                                    context.startActivity(intent)
+                                } catch (e: Exception) {
+                                    Toast.makeText(context, R.string.cant_complete_requested_operation, Toast.LENGTH_SHORT).show()
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.small
+                        ) {
+                            Text(
+                                stringResource(R.string.view_in_play_store),
+                                style = MaterialTheme.typography.labelLarge
+                            )
+                        }
                     }
                 }
             }
@@ -221,82 +276,151 @@ fun AppDetailScreen(packageName: String, onNavigateBack: () -> Unit) {
 }
 
 @Composable
-private fun HeaderSection(packageInfo: PackageInfo, icon: android.graphics.drawable.Drawable?, isSystemApp: Boolean, isDisabled: Boolean = false) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        if (icon != null) {
-            AndroidView(
-                factory = { ImageView(it).apply { setImageDrawable(icon) } },
-                modifier = Modifier.size(56.dp).clip(CircleShape)
-            )
-        } else {
-            Icon(
-                painter = painterResource(R.drawable.sym_def_app_icon),
-                contentDescription = null,
-                modifier = Modifier.size(56.dp).clip(CircleShape)
-            )
+private fun SectionCard(content: @Composable () -> Unit) {
+    Card(
+        shape = MaterialTheme.shapes.small,
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            content()
         }
-        Spacer(Modifier.width(16.dp))
-        Column {
-            Text(
-                text = PackageManagerUtilities.getApplicationLabel(
-                    LocalContext.current, packageInfo.packageName, packageInfo.packageName
-                ),
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = packageInfo.packageName,
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                val badgeColor = MaterialTheme.colorScheme.primary
+    }
+}
+
+@Composable
+private fun HeaderSection(packageInfo: PackageInfo, icon: android.graphics.drawable.Drawable?, isSystemApp: Boolean, isDisabled: Boolean = false) {
+    Box {
+        Surface(
+            shape = MaterialTheme.shapes.small,
+            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+            tonalElevation = 1.dp
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = badgeColor.copy(alpha = 0.15f)
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 4.dp
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                    Box(
+                        modifier = Modifier.size(80.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        if (isSystemApp) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_system_app),
-                                contentDescription = null,
-                                tint = badgeColor,
-                                modifier = Modifier.size(14.dp)
+                        if (icon != null) {
+                            AndroidView(
+                                factory = {
+                                    ImageView(it).apply { setImageDrawable(icon) }
+                                },
+                                modifier = Modifier
+                                    .size(72.dp)
+                                    .clip(CircleShape)
                             )
-                            Spacer(Modifier.width(4.dp))
+                        } else {
+                            Icon(
+                                painter = painterResource(R.drawable.sym_def_app_icon),
+                                contentDescription = null,
+                                modifier = Modifier.size(72.dp)
+                            )
                         }
-                        Text(
-                            text = if (isSystemApp) stringResource(R.string.system_app)
-                                   else stringResource(R.string.user_app),
-                            fontSize = 12.sp,
-                            color = badgeColor
-                        )
                     }
                 }
-                if (isDisabled) {
+
+                Spacer(Modifier.height(16.dp))
+
+                Text(
+                    text = PackageManagerUtilities.getApplicationLabel(
+                        LocalContext.current, packageInfo.packageName, packageInfo.packageName
+                    ),
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Text(
+                    text = packageInfo.packageName,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Spacer(Modifier.height(12.dp))
+
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    val badgeColor = MaterialTheme.colorScheme.tertiary
+
                     Surface(
-                        shape = RoundedCornerShape(8.dp),
+                        shape = RoundedCornerShape(
+                            topStart = 4.dp,
+                            topEnd = 8.dp,
+                            bottomEnd = 8.dp,
+                            bottomStart = 4.dp
+                        ),
                         color = badgeColor.copy(alpha = 0.15f)
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                         ) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_block),
-                                contentDescription = null,
-                                tint = badgeColor,
-                                modifier = Modifier.size(14.dp)
-                            )
-                            Spacer(Modifier.width(4.dp))
+                            if (isSystemApp) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_system_app),
+                                    contentDescription = null,
+                                    tint = badgeColor,
+                                    modifier = Modifier.size(16.dp)
+                                )
+
+                                Spacer(Modifier.width(4.dp))
+                            }
+
                             Text(
-                                text = stringResource(R.string.badge_disabled_app),
-                                fontSize = 12.sp,
+                                text = if (isSystemApp) stringResource(R.string.system_app)
+                                       else stringResource(R.string.user_app),
+                                style = MaterialTheme.typography.labelMedium,
                                 color = badgeColor
                             )
+                        }
+                    }
+                    if (isDisabled) {
+                        Surface(
+                            shape = RoundedCornerShape(
+                                topStart = 4.dp,
+                                topEnd = 8.dp,
+                                bottomEnd = 8.dp,
+                                bottomStart = 4.dp
+                            ),
+                            color = MaterialTheme.colorScheme.error.copy(alpha = 0.15f)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_block),
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.error,
+                                    modifier = Modifier.size(16.dp)
+                                )
+
+                                Spacer(Modifier.width(4.dp))
+
+                                Text(
+                                    text = stringResource(R.string.badge_disabled_app),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
                         }
                     }
                 }
@@ -308,42 +432,45 @@ private fun HeaderSection(packageInfo: PackageInfo, icon: android.graphics.drawa
 @Composable
 private fun InfoSection(packageInfo: PackageInfo, installSource: String) {
     val dateFmt = remember { DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT) }
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        SectionTitle(stringResource(R.string.app_info))
-        InfoRow(stringResource(R.string.version), "${packageInfo.versionName ?: ""} (${packageInfo.longVersionCode})")
-        InfoRow(
-            stringResource(R.string.requires_android),
-            "${packageInfo.applicationInfo?.minSdkVersion ?: "?"} → ${packageInfo.applicationInfo?.targetSdkVersion ?: "?"}"
-        )
-        InfoRow(stringResource(R.string.installed), dateFmt.format(Date(packageInfo.firstInstallTime)))
-        if (packageInfo.firstInstallTime != packageInfo.lastUpdateTime) {
-            InfoRow(stringResource(R.string.last_updated), dateFmt.format(Date(packageInfo.lastUpdateTime)))
-        }
-        InfoRow(stringResource(R.string.install_source), installSource)
+    SectionTitle(stringResource(R.string.app_info))
+    InfoRow(stringResource(R.string.version), "${packageInfo.versionName ?: ""} (${packageInfo.longVersionCode})")
+    InfoRow(
+        stringResource(R.string.requires_android),
+        "${packageInfo.applicationInfo?.minSdkVersion ?: "?"} -> ${packageInfo.applicationInfo?.targetSdkVersion ?: "?"}"
+    )
+    InfoRow(stringResource(R.string.installed), dateFmt.format(Date(packageInfo.firstInstallTime)))
+    if (packageInfo.firstInstallTime != packageInfo.lastUpdateTime) {
+        InfoRow(stringResource(R.string.last_updated), dateFmt.format(Date(packageInfo.lastUpdateTime)))
     }
+    InfoRow(stringResource(R.string.install_source), installSource)
 }
 
 @Composable
 private fun ApkSection(packageInfo: PackageInfo) {
     val ai = packageInfo.applicationInfo ?: return
     val splits = ai.splitSourceDirs
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        SectionTitle(stringResource(R.string.apk_files))
-        val base = java.io.File(ai.sourceDir)
-        InfoRow(stringResource(R.string.base_apk), "${base.name} (${formatBytes(base.length())})")
-        if (!splits.isNullOrEmpty()) {
-            splits.forEachIndexed { i, path ->
-                val f = java.io.File(path)
-                InfoRow(stringResource(R.string.split_apk, i + 1), "${f.name} (${formatBytes(f.length())})")
-            }
-            val total = splits.sumOf { java.io.File(it).length() } + base.length()
-            Text(
-                text = stringResource(R.string.total_size, formatBytes(total)),
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+
+    SectionTitle(stringResource(R.string.apk_files))
+
+    val base = File(ai.sourceDir)
+
+    InfoRow(stringResource(R.string.base_apk), "${base.name} (${formatBytes(base.length())})")
+
+    if (!splits.isNullOrEmpty()) {
+        splits.forEachIndexed { i, path ->
+            val f = File(path)
+
+            InfoRow(stringResource(R.string.split_apk, i + 1), "${f.name} (${formatBytes(f.length())})")
         }
+        val total = splits.sumOf { File(it).length() } + base.length()
+
+        Text(
+            text = stringResource(R.string.total_size, formatBytes(total)),
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.tertiary,
+            modifier = Modifier.padding(top = 4.dp)
+        )
     }
 }
 
@@ -358,26 +485,25 @@ private fun StorageStatsSection(packageName: String, packageInfo: PackageInfo) {
         } catch (e: Exception) { null }
     }
     if (stats != null) {
-        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            SectionTitle(stringResource(R.string.app_storage))
+        SectionTitle(stringResource(R.string.app_storage))
 
-            val applicationInfo = packageInfo.applicationInfo
-            if (applicationInfo != null) {
-                var realSize = File(applicationInfo.sourceDir).length()
-                if (!applicationInfo.splitSourceDirs.isNullOrEmpty()) {
-                    for (split in applicationInfo.splitSourceDirs) {
-                        realSize += File(split).length()
-                    }
+        val applicationInfo = packageInfo.applicationInfo
+        if (applicationInfo != null) {
+            var realSize = File(applicationInfo.sourceDir).length()
+            if (!applicationInfo.splitSourceDirs.isNullOrEmpty()) {
+                for (split in applicationInfo.splitSourceDirs) {
+                    realSize += File(split).length()
                 }
-                InfoRow(stringResource(R.string.apks_size), stringResource(R.string.apks_size_extended_value, formatBytes(realSize), formatBytes(stats.appBytes)))
             }
-            else {
-                InfoRow(stringResource(R.string.apks_size), formatBytes(stats.appBytes))
-            }
-
-            InfoRow(stringResource(R.string.data_size), formatBytes(stats.dataBytes))
-            InfoRow(stringResource(R.string.cache_size), formatBytes(stats.cacheBytes))
+            InfoRow(stringResource(R.string.apks_size), stringResource(R.string.apks_size_extended_value, formatBytes(realSize), formatBytes(stats.appBytes)))
         }
+        else {
+            InfoRow(stringResource(R.string.apks_size), formatBytes(stats.appBytes))
+        }
+
+        InfoRow(stringResource(R.string.data_size), formatBytes(stats.dataBytes))
+
+        InfoRow(stringResource(R.string.cache_size), formatBytes(stats.cacheBytes))
     }
 }
 
@@ -386,33 +512,36 @@ private fun SigningSection(packageInfo: PackageInfo) {
     val si = packageInfo.signingInfo ?: return
     val certs = si.signingCertificateHistory ?: return
     if (certs.isEmpty()) return
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        SectionTitle(stringResource(R.string.signatures))
-        val signerLabel = stringResource(R.string.signer_single)
-        val ctx = LocalContext.current
-        certs.forEachIndexed { i, cert ->
-            val sha256 = try {
-                val cf = CertificateFactory.getInstance("X.509")
-                val x509 = cf.generateCertificate(ByteArrayInputStream(cert.toByteArray()))
-                val digest = MessageDigest.getInstance("SHA-256").digest(x509.encoded)
-                digest.joinToString("") { "%02x".format(it) }
-            } catch (e: Exception) { "?" }
-            val label = if (certs.size > 1) "$signerLabel ${i + 1}" else signerLabel
-            Row {
-                Text(text = "$label: ", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface)
-                Spacer(Modifier.width(4.dp))
-                Text(
-                    text = sha256,
-                    fontSize = 13.sp,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.clickable {
-                        val clip = ClipData.newPlainText("SHA-256", sha256)
-                        (ctx.getSystemService(ClipboardManager::class.java))
-                            ?.setPrimaryClip(clip)
-                        Toast.makeText(ctx, R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show()
-                    }
-                )
-            }
+    SectionTitle(stringResource(R.string.signatures))
+    val signerLabel = stringResource(R.string.signer_single)
+    val ctx = LocalContext.current
+    certs.forEachIndexed { i, cert ->
+        val sha256 = try {
+            val cf = CertificateFactory.getInstance("X.509")
+            val x509 = cf.generateCertificate(ByteArrayInputStream(cert.toByteArray()))
+            val digest = MessageDigest.getInstance("SHA-256").digest(x509.encoded)
+            digest.joinToString("") { "%02x".format(it) }
+        } catch (e: Exception) { "?" }
+        val label = if (certs.size > 1) "$signerLabel ${i + 1}" else signerLabel
+        Row {
+            Text(
+                text = "$label: ",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(Modifier.width(4.dp))
+            Text(
+                text = sha256,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.clickable {
+                    val clip = ClipData.newPlainText("SHA-256", sha256)
+                    (ctx.getSystemService(ClipboardManager::class.java))
+                        ?.setPrimaryClip(clip)
+                    Toast.makeText(ctx, R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show()
+                }
+            )
         }
     }
 }
@@ -424,20 +553,22 @@ private fun ManifestComponentsSection(packageInfo: PackageInfo) {
     val receivers = packageInfo.receivers?.filter { it.name.startsWith(packageInfo.packageName) }?.toList() ?: emptyList()
     val providers = packageInfo.providers?.filter { it.name.startsWith(packageInfo.packageName) }?.toList() ?: emptyList()
     if (activities.isEmpty() && services.isEmpty() && receivers.isEmpty() && providers.isEmpty()) return
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        SectionTitle(stringResource(R.string.manifest_components))
-        if (activities.isNotEmpty()) {
-            InfoRow(stringResource(R.string.activities), activities.size.toString())
-        }
-        if (services.isNotEmpty()) {
-            InfoRow(stringResource(R.string.services), services.size.toString())
-        }
-        if (receivers.isNotEmpty()) {
-            InfoRow(stringResource(R.string.receivers), receivers.size.toString())
-        }
-        if (providers.isNotEmpty()) {
-            InfoRow(stringResource(R.string.providers), providers.size.toString())
-        }
+    SectionTitle(stringResource(R.string.manifest_components))
+
+    if (activities.isNotEmpty()) {
+        InfoRow(stringResource(R.string.activities), activities.size.toString())
+    }
+
+    if (services.isNotEmpty()) {
+        InfoRow(stringResource(R.string.services), services.size.toString())
+    }
+
+    if (receivers.isNotEmpty()) {
+        InfoRow(stringResource(R.string.receivers), receivers.size.toString())
+    }
+
+    if (providers.isNotEmpty()) {
+        InfoRow(stringResource(R.string.providers), providers.size.toString())
     }
 }
 
@@ -445,19 +576,30 @@ private fun ManifestComponentsSection(packageInfo: PackageInfo) {
 private fun SectionTitle(text: String) {
     Text(
         text = text,
-        fontSize = 14.sp,
-        fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(top = 8.dp, bottom = 2.dp)
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.SemiBold,
+        color = MaterialTheme.colorScheme.tertiary,
+        modifier = Modifier.padding(bottom = 4.dp)
     )
 }
 
 @Composable
 private fun InfoRow(label: String, value: String) {
     Row {
-        Text(text = "$label: ", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface)
+        Text(
+            text = "$label: ",
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+
         Spacer(Modifier.width(4.dp))
-        Text(text = value, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 
@@ -477,34 +619,37 @@ private fun isUsageStatsGranted(context: Context): Boolean {
     return mode == AppOpsManager.MODE_ALLOWED
 }
 
+@SuppressLint("LocalContextGetResourceValueCall")
 @Composable
-private fun specialPermissionsSection(packageInfo: PackageInfo, declaredPermissions: Set<String>) {
-    val ctx = LocalContext.current
+private fun SpecialPermissionsSection(packageInfo: PackageInfo, declaredPermissions: Set<String>) {
+    val context = LocalContext.current
     val specials = remember(packageInfo, declaredPermissions) {
         val names = mutableListOf<String>()
         fun has(perm: String) = perm in declaredPermissions
-        // Non-BIND special permissions (declared via <uses-permission>)
-        if (has("android.permission.SYSTEM_ALERT_WINDOW")) names.add(ctx.getString(R.string.overlay))
-        if (has("android.permission.WRITE_SETTINGS")) names.add(ctx.getString(R.string.write_settings))
-        if (has("android.permission.REQUEST_INSTALL_PACKAGES")) names.add(ctx.getString(R.string.install_unknown_apps))
-        if (has("android.permission.MANAGE_EXTERNAL_STORAGE")) names.add(ctx.getString(R.string.manage_all_files))
-        // BIND_* permissions are declared on the component tag, not in <uses-permission>
+        if (has("android.permission.SYSTEM_ALERT_WINDOW")) names.add(context.getString(R.string.overlay))
+        if (has("android.permission.WRITE_SETTINGS")) names.add(context.getString(R.string.write_settings))
+        if (has("android.permission.REQUEST_INSTALL_PACKAGES")) names.add(context.getString(R.string.install_unknown_apps))
+        if (has("android.permission.MANAGE_EXTERNAL_STORAGE")) names.add(context.getString(R.string.manage_all_files))
         val servicePerms = packageInfo.services?.map { it.permission }.orEmpty()
         val receiverPerms = packageInfo.receivers?.map { it.permission }.orEmpty()
         val allComponentPerms = servicePerms + receiverPerms
         if ("android.permission.BIND_ACCESSIBILITY_SERVICE" in allComponentPerms)
-            names.add(ctx.getString(R.string.accessibility))
+            names.add(context.getString(R.string.accessibility))
         if ("android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" in allComponentPerms)
-            names.add(ctx.getString(R.string.notification_listener))
+            names.add(context.getString(R.string.notification_listener))
         if ("android.permission.BIND_DEVICE_ADMIN" in allComponentPerms)
-            names.add(ctx.getString(R.string.device_admin))
+            names.add(context.getString(R.string.device_admin))
         names
     }
     if (specials.isEmpty()) return
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        SectionTitle(stringResource(R.string.special_permissions))
-        specials.forEach { label ->
-            Text(label, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface)
-        }
+
+    SectionTitle(stringResource(R.string.special_permissions))
+
+    specials.forEach { label ->
+        Text(
+            label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
     }
 }

@@ -23,7 +23,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
@@ -61,12 +60,11 @@ fun AppContextMenuItem(
         modifier = Modifier
             .fillMaxWidth()
             .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier)
-            .padding(horizontal = 24.dp, vertical = 14.dp),
+            .padding(horizontal = 24.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
-            modifier = Modifier
-                .size(24.dp),
+            modifier = Modifier.size(24.dp),
             contentAlignment = Alignment.Center
         ) {
             icon()
@@ -86,7 +84,12 @@ fun DefaultTopBar(
     hasItems: Boolean
 ) {
     TopAppBar(
-        title = { Text(stringResource(R.string.app_name)) },
+        title = {
+            Text(
+                text = stringResource(R.string.app_name),
+                style = MaterialTheme.typography.headlineSmall
+            )
+        },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primary,
             titleContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -116,7 +119,12 @@ fun SelectionTopBar(
     onCancel: () -> Unit
 ) {
     TopAppBar(
-        title = { Text(stringResource(R.string.selected_count, selectedCount)) },
+        title = {
+            Text(
+                text = stringResource(R.string.selected_count, selectedCount),
+                style = MaterialTheme.typography.titleLarge
+            )
+        },
         navigationIcon = {
             IconButton(onClick = onCancel) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
@@ -139,8 +147,6 @@ fun SelectionBottomBar(
     onSave: () -> Unit,
     onMarkDone: () -> Unit
 ) {
-    val accentTint = MaterialTheme.colorScheme.primary
-
     BottomAppBar(
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         tonalElevation = 3.dp
@@ -152,7 +158,7 @@ fun SelectionBottomBar(
         ) {
             BottomBarAction(
                 icon = {
-                    SelectAllIcon(checked = allSelected, tint = accentTint)
+                    SelectAllIcon(checked = allSelected, tint = MaterialTheme.colorScheme.primary)
                 },
                 label = stringResource(
                     if (allSelected) R.string.select_none else R.string.select_all
@@ -165,7 +171,7 @@ fun SelectionBottomBar(
                         painter = painterResource(R.drawable.ic_content_save_outline),
                         contentDescription = null,
                         modifier = Modifier.size(24.dp),
-                        tint = accentTint
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 },
                 label = stringResource(R.string.backup_on),
@@ -177,7 +183,7 @@ fun SelectionBottomBar(
                         painter = painterResource(R.drawable.ic_auto_backup_off),
                         contentDescription = null,
                         modifier = Modifier.size(24.dp),
-                        tint = accentTint
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 },
                 label = stringResource(R.string.backup_off),
@@ -189,7 +195,7 @@ fun SelectionBottomBar(
                         painter = painterResource(R.drawable.ic_actionbar_save_apps),
                         contentDescription = null,
                         modifier = Modifier.size(24.dp),
-                        tint = accentTint
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 },
                 label = stringResource(R.string.save_selected),
@@ -201,7 +207,7 @@ fun SelectionBottomBar(
                         painter = painterResource(R.drawable.ic_actionbar_accept),
                         contentDescription = null,
                         modifier = Modifier.size(24.dp),
-                        tint = accentTint
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 },
                 label = stringResource(R.string.done),
@@ -221,13 +227,13 @@ fun BottomBarAction(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .clickable(onClick = onClick)
-            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .padding(horizontal = 8.dp, vertical = 6.dp)
     ) {
         icon()
-        Spacer(Modifier.height(2.dp))
+        Spacer(Modifier.height(4.dp))
         Text(
             text = label,
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.labelMedium
         )
     }
 }
@@ -271,8 +277,16 @@ fun SearchTopBar(
             TextField(
                 value = query,
                 onValueChange = onQueryChange,
-                placeholder = { Text(stringResource(R.string.search)) },
+                placeholder = {
+                    Text(
+                        stringResource(R.string.search),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                },
                 singleLine = true,
+                textStyle = MaterialTheme.typography.bodyLarge.copy(
+                    color = MaterialTheme.colorScheme.onPrimary
+                ),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
@@ -303,7 +317,20 @@ fun LoadingState() {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        CircularProgressIndicator()
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            CircularProgressIndicator(
+                color = MaterialTheme.colorScheme.tertiary,
+                strokeWidth = 4.dp
+            )
+            Text(
+                text = stringResource(R.string.loading),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
 
@@ -314,16 +341,27 @@ fun EmptyState() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Image(
-            painter = painterResource(R.drawable.ic_no_apps_big),
-            contentDescription = null,
-            modifier = Modifier.size(120.dp)
-        )
-        Spacer(Modifier.height(16.dp))
+        Surface(
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            tonalElevation = 2.dp
+        ) {
+            Box(
+                modifier = Modifier.size(120.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.ic_no_apps_big),
+                    contentDescription = null,
+                    modifier = Modifier.size(64.dp)
+                )
+            }
+        }
+        Spacer(Modifier.height(24.dp))
         Text(
             text = stringResource(R.string.no_apps),
-            color = Color.Gray,
-            fontSize = 18.sp
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
@@ -358,7 +396,7 @@ fun AppList(
         Box(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
-                .width(20.dp)
+                .width(24.dp)
                 .fillMaxHeight()
                 .onSizeChanged { lettersHeight = it.height.toFloat() }
                 .pointerInput(lettersHeight) {
@@ -385,7 +423,8 @@ fun AppList(
                 for (letter in letters) {
                     Text(
                         text = letter.toString(),
-                        fontSize = 10.sp,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -419,7 +458,7 @@ fun AppCardWithSpacing(
                 viewModel.startSelection(item)
             }
         },
-        modifier = Modifier.padding(horizontal = 4.dp, vertical = 6.dp)
+        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
     )
 }
 
@@ -432,24 +471,29 @@ fun StatusBadge(
     onClick: (() -> Unit)? = null
 ) {
     Surface(
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(
+            topStart = 4.dp,
+            topEnd = 8.dp,
+            bottomEnd = 8.dp,
+            bottomStart = 4.dp
+        ),
         color = containerColor.copy(alpha = 0.15f),
         modifier = if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
         ) {
             Icon(
                 painter = icon,
                 contentDescription = null,
                 tint = containerColor,
-                modifier = Modifier.size(14.dp)
+                modifier = Modifier.size(16.dp)
             )
             Spacer(Modifier.width(4.dp))
             Text(
                 text = label,
-                fontSize = 12.sp,
+                style = MaterialTheme.typography.labelMedium,
                 color = containerColor
             )
         }
@@ -484,47 +528,51 @@ fun AppCard(
         )
     )
 
-    val cardBorder = if (blackBackground && isSystemInDarkTheme()) {
+    val cardBorder = if (isSelected) {
+        BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
+    } else if (blackBackground && isSystemInDarkTheme()) {
         BorderStroke(1.dp, Color(0xFF444444))
     } else {
         null
     }
 
     val badgeContainer = if (isSelected)
-        MaterialTheme.colorScheme.onPrimaryContainer
+        MaterialTheme.colorScheme.tertiary
     else
         MaterialTheme.colorScheme.primary
     val badgeTint = if (isSelected)
-        MaterialTheme.colorScheme.onPrimaryContainer
+        MaterialTheme.colorScheme.onTertiary
     else
         MaterialTheme.colorScheme.onPrimary
 
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 4.dp)
-            .clip(RoundedCornerShape(12.dp))
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = onLongClick
             ),
-        shape = RoundedCornerShape(12.dp),
+        shape = MaterialTheme.shapes.medium,
         border = cardBorder,
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = if (isSelected) 8.dp else 4.dp
+        ),
         colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer
-                             else if (blackBackground && isSystemInDarkTheme()) MaterialTheme.colorScheme.surface
-                             else MaterialTheme.colorScheme.surfaceContainer
+            containerColor = when {
+                isSelected -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
+                blackBackground && isSystemInDarkTheme() -> MaterialTheme.colorScheme.surface
+                else -> MaterialTheme.colorScheme.surfaceContainer
+            }
         )
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(16.dp),
             verticalAlignment = Alignment.Top
         ) {
             Box(modifier = Modifier
-                .size(50.dp)
+                .size(64.dp)
                 .clip(CircleShape)) {
                 if (item.icon != null) {
                     Image(
@@ -554,7 +602,7 @@ fun AppCard(
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
-                            .size(36.dp)
+                            .size(40.dp)
                             .align(Alignment.Center)
                     )
                 }
@@ -563,13 +611,13 @@ fun AppCard(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(start = 12.dp)
+                    .padding(start = 16.dp)
             ) {
                 Text(
                     text = item.appLabel,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    fontSize = 18.sp,
+                    style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 if (item.packageName != item.appLabel) {
@@ -577,7 +625,7 @@ fun AppCard(
                         text = item.packageName,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        fontSize = 14.sp,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -586,7 +634,7 @@ fun AppCard(
                         text = stringResource(R.string.app_version_name_and_number, item.versionName?:"", item.versionCode),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        fontSize = 14.sp,
+                        style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -690,15 +738,26 @@ fun InstallDescriptionDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.install_app)) },
+        shape = MaterialTheme.shapes.large,
+        title = {
+            Text(
+                stringResource(R.string.install_app),
+                style = MaterialTheme.typography.headlineSmall
+            )
+        },
         text = {
-            Column {
-                Text(stringResource(R.string.install_app_description))
-                Spacer(Modifier.height(16.dp))
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    stringResource(R.string.install_app_description),
+                    style = MaterialTheme.typography.bodyLarge
+                )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(checked = notShowAgain, onCheckedChange = { notShowAgain = it })
                     Spacer(Modifier.width(8.dp))
-                    Text(stringResource(R.string.do_not_show_anymore))
+                    Text(
+                        stringResource(R.string.do_not_show_anymore),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
         },
@@ -711,12 +770,18 @@ fun InstallDescriptionDialog(
                 }
                 onAccept()
             }) {
-                Text(stringResource(R.string.accept_button))
+                Text(
+                    stringResource(R.string.accept_button),
+                    style = MaterialTheme.typography.labelLarge
+                )
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.cancel_button))
+                Text(
+                    stringResource(R.string.cancel_button),
+                    style = MaterialTheme.typography.labelLarge
+                )
             }
         }
     )
