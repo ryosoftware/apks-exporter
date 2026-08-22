@@ -5,18 +5,14 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.text.format.DateUtils
 import androidx.documentfile.provider.DocumentFile
-import androidx.work.*
 import com.ryosoftware.utilities.*
-import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 import androidx.core.net.toUri
 
 @Singleton
 class MainService @Inject constructor(
-    @ApplicationContext private val context: Context
 ) {
     companion object {
         lateinit var instance: MainService

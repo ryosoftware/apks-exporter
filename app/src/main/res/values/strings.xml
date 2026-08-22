@@ -33,8 +33,6 @@
 
     <string name="save_folder">Save folder</string>
     <string name="save_folder_not_set">Click to select the folder on the app will store backups</string>
-    <string name="no_save_folder_selected">No local folder selected.\n\nPlease, go App Settings then select a folder to store backup files</string>
-    <string name="cant_write_to_local_selected_folder">Can\'t create files at local selected folder.\n\nPlease, allow the app to create files in that folder</string>
 
     <string name="backup_format">Backup Files Format</string>
 
@@ -110,7 +108,6 @@
     <string name="uninstall_updates">Uninstall updates</string>
     <string name="app_info">App info</string>
     <string name="open_app">Open app</string>
-    <string name="share_app">Share APK</string>
 
     <string name="app_detail_info">App details</string>
     <string name="open_system_app_info">App Info at system settings</string>
@@ -131,7 +128,6 @@
     <string name="permissions">Permissions</string>
     <string name="signatures">Signatures</string>
     <string name="signer_single">Signer</string>
-    <string name="signer">Signer %1$d</string>
     <string name="manifest_components">Manifest components</string>
     <string name="activities">Activities</string>
     <string name="services">Services</string>
@@ -153,13 +149,8 @@
     <string name="save_selected">Save selected</string>
     <string name="done">Done</string>
 
-    <string name="save_apps">Save apps</string>
-
     <string name="no_apps">No apps</string>
 
-    <string name="information">Information</string>
-    <string name="error">Error</string>
-    
     <string name="accept_button">Accept</string>
     <string name="cancel_button">Cancel</string>
 

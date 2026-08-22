@@ -7,7 +7,6 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.storage.StorageManager
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,6 +28,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -74,7 +74,7 @@ class MainViewModel @Inject constructor(
         if (_isLoading.value) return
         _isLoading.value = true
         viewModelScope.launch {
-            delay(100)
+            delay(100.milliseconds)
             val loadedItems = doLoad()
             _items.value = loadedItems ?: emptyList()
             if (loadedItems != null) {

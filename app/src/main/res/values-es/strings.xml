@@ -33,8 +33,6 @@
 
     <string name="save_folder">Directorio de la app</string>
     <string name="save_folder_not_set">Haga clic para seleccionar el directorio local en el que se guardarán los backups</string>
-    <string name="no_save_folder_selected">No se ha seleccionado el directorio local.\n\nPor favor, acceda a la configuración de la app y seleccione un directorio en el que guardar los backups</string>
-    <string name="cant_write_to_local_selected_folder">No se puede escribir en el directorio local seleccionado.\n\nPor favor, conceda permisos de escritura en el directorio</string>
 
     <string name="backup_format">Formato de los archivos de backup</string>
 
@@ -111,7 +109,6 @@
     <string name="uninstall_updates">Desinstalar actualizaciones</string>
     <string name="app_info">Información de la App</string>
     <string name="open_app">Abrir app</string>
-    <string name="share_app">Compartir APK</string>
 
     <string name="app_detail_info">Detalles de la app</string>
     <string name="open_system_app_info">Información en ajustes del sistema</string>
@@ -132,7 +129,6 @@
     <string name="permissions">Permisos</string>
     <string name="signatures">Firmas</string>
     <string name="signer_single">Firmante</string>
-    <string name="signer">Firmante %1$d</string>
     <string name="manifest_components">Componentes del manifest</string>
     <string name="activities">Actividades</string>
     <string name="services">Servicios</string>
@@ -154,13 +150,8 @@
     <string name="save_selected">Guardar selección</string>
     <string name="done">Hecho</string>
 
-    <string name="save_apps">Guardar apps</string>
-
     <string name="no_apps">No hay apps</string>
 
-    <string name="information">Information</string>
-    <string name="error">Error</string>
-    
     <string name="accept_button">Aceptar</string>
     <string name="cancel_button">Cancelar</string>
 

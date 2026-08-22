@@ -3,14 +3,10 @@ package com.ryosoftware.apks_exporter
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Context
-import android.net.Uri
-import androidx.core.content.FileProvider
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import com.ryosoftware.utilities.LogUtilities
 import dagger.hilt.android.HiltAndroidApp
-import java.io.File
 import javax.inject.Inject
 
 @HiltAndroidApp
@@ -92,12 +88,5 @@ class Main : Application(), Configuration.Provider, Thread.UncaughtExceptionHand
         const val AUTO_CREATED_BACKUPS_NOTIFICATION_CHANNEL = "auto-created-backups-notification"
         const val AUTO_CREATED_BACKUPS_NONE_NOTIFICATION_CHANNEL = "auto-created-backups-none-notification"
         const val AUTO_CREATED_BACKUPS_ERROR_NOTIFICATION_CHANNEL = "auto-created-backups-error-notification"
-
-        fun getUriFromFile(context: Context, file: File): Uri =
-            FileProvider.getUriForFile(
-                context,
-                "${context.packageName}.files-provider",
-                file
-            )
     }
 }

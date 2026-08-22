@@ -22,9 +22,7 @@ import java.util.concurrent.TimeUnit
 @HiltWorker
 class MainBackupWorker @AssistedInject constructor(
     @Assisted context: Context,
-    @Assisted workerParams: WorkerParameters,
-    private val applicationPreferences: ApplicationPreferences,
-    private val mainService: MainService
+    @Assisted workerParams: WorkerParameters
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {

@@ -48,7 +48,7 @@ class InstallCompletedReceiver : BroadcastReceiver() {
     }
 
     companion object {
-        val ACTION_INSTALL_COMPLETED: String = BuildConfig.APPLICATION_ID + ".INSTALL_COMPLETED"
+        const val ACTION_INSTALL_COMPLETED: String = BuildConfig.APPLICATION_ID + ".INSTALL_COMPLETED"
         private val INSTALLER_ALLOWED_PACKAGES = listOf("com.android.packageinstaller", "com.google.android.packageinstaller")
         private const val ACTION_PACKAGE_MANAGER_CONFIRM_INSTALL = "android.content.pm.action.CONFIRM_INSTALL"
     }

@@ -44,7 +44,6 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 
@@ -466,7 +465,6 @@ fun AppCardWithSpacing(
 fun StatusBadge(
     icon: Painter,
     containerColor: Color,
-    tint: Color,
     label: String,
     onClick: (() -> Unit)? = null
 ) {
@@ -647,7 +645,6 @@ fun AppCard(
                         StatusBadge(
                             icon = painterResource(R.drawable.ic_split_apk),
                             containerColor = badgeContainer,
-                            tint = badgeTint,
                             label = pluralStringResource(R.plurals.count_apks, item.apkCount, item.apkCount, sizeToStr(item.apkSize))
                         )
                     }
@@ -655,7 +652,6 @@ fun AppCard(
                         StatusBadge(
                             icon = painterResource(R.drawable.ic_system_app),
                             containerColor = badgeContainer,
-                            tint = badgeTint,
                             label = stringResource(R.string.badge_system_app)
                         )
                     }
@@ -663,7 +659,6 @@ fun AppCard(
                         StatusBadge(
                             icon = painterResource(R.drawable.ic_block),
                             containerColor = badgeContainer,
-                            tint = badgeTint,
                             label = stringResource(R.string.badge_disabled_app)
                         )
                     }
@@ -671,7 +666,6 @@ fun AppCard(
                         StatusBadge(
                             icon = painterResource(R.drawable.ic_app_updated),
                             containerColor = badgeContainer,
-                            tint = badgeTint,
                             label = stringResource(R.string.badge_app_recently_updated)
                         )
                     }
@@ -679,7 +673,6 @@ fun AppCard(
                         StatusBadge(
                             icon = painterResource(R.drawable.ic_auto_backup_off),
                             containerColor = MaterialTheme.colorScheme.error,
-                            tint = MaterialTheme.colorScheme.onError,
                             label = stringResource(R.string.badge_autobackup_off),
                             onClick = {
                                 item.canAutomaticallyBackup(true)

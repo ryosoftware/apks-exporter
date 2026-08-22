@@ -515,7 +515,7 @@ internal const val DO_NOT_SHOW_INSTALL_APP_FILE_PICKER_DESCRIPTION_KEY = "do-not
 
 private fun doInstallApp(
     activity: Activity,
-    uri: android.net.Uri,
+    uri: Uri,
     onFinish: () -> Unit
 ) {
     InstallAppTask(activity, uri, object : InstallAppTask.Listener {
