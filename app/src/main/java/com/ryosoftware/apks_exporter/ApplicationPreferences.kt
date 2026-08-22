@@ -103,6 +103,7 @@ class ApplicationPreferences @Inject constructor(
         inline fun <reified T> get(name: String, defaultValue: T): T = instance.get(name, defaultValue)
         inline fun <reified T> observe(name: String, defaultValue: T): Flow<T> = instance.observe(name, defaultValue)
         inline fun <reified T> put(name: String, value: T) = instance.put(name, value)
+        suspend inline fun <reified T> putSuspend(name: String, value: T) = instance.putSuspend(name, value)
         fun containsKey(name: String): Boolean = instance.containsKey(name)
         fun delete(name: String) = instance.delete(name)
         fun delete(names: Array<String>) = instance.delete(names)
@@ -285,6 +286,22 @@ class ApplicationPreferences @Inject constructor(
             dataStore.edit { prefs ->
                 prefs[key as Preferences.Key<T>] = value
             }
+        }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    suspend inline fun <reified T> putSuspend(name: String, value: T) {
+        val key = when (T::class) {
+            Boolean::class -> booleanPreferencesKey(name)
+            Int::class -> intPreferencesKey(name)
+            Long::class -> longPreferencesKey(name)
+            String::class -> stringPreferencesKey(name)
+            Float::class -> floatPreferencesKey(name)
+            Set::class -> stringSetPreferencesKey(name)
+            else -> throw IllegalArgumentException("Unsupported type: ${T::class}")
+        }
+        dataStore.edit { prefs ->
+            prefs[key as Preferences.Key<T>] = value
         }
     }
 

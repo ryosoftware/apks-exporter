@@ -63,12 +63,11 @@ fun MainScreen(
 
     var contextMenuItem by remember { mutableStateOf<AppItem?>(null) }
     var showInstallDescription by remember { mutableStateOf(false) }
-    var showNoFolderDialog by remember { mutableStateOf(false) }
+    var onFolderSelectedCallback by remember { mutableStateOf<((Uri) -> Unit)?>(null) }
     var isSaving by remember { mutableStateOf(false) }
     var isInstalling by remember { mutableStateOf(false) }
     var pendingInstallUri by remember { mutableStateOf<Uri?>(null) }
 
-    val saveFolderUri = ApplicationPreferences.get<String?>(ApplicationPreferences.SAVE_FOLDER_KEY, null)
     val autoBackupEnabled = ApplicationPreferences.get(
         ApplicationPreferences.AUTO_BACKUP_APPS_KEY,
         ApplicationPreferences.AUTO_BACKUP_APPS_DEFAULT
@@ -112,6 +111,43 @@ fun MainScreen(
                     "package:${activity.packageName}".toUri()
                 )
                 installPermissionLauncher.launch(intent)
+            }
+        }
+    }
+
+    val folderPickerLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocumentTree()
+    ) { uri ->
+        if (uri != null) {
+            activity.contentResolver.takePersistableUriPermission(
+                uri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            )
+            scope.launch {
+                ApplicationPreferences.putSuspend(ApplicationPreferences.SAVE_FOLDER_KEY, uri.toString())
+                onFolderSelectedCallback?.invoke(uri)
+                onFolderSelectedCallback = null
+            }
+        } else {
+            onFolderSelectedCallback = null
+        }
+    }
+
+    fun launchFolderPicker(uri: Uri?, onFolderSelected: (Uri) -> Unit) {
+        onFolderSelectedCallback = onFolderSelected
+        folderPickerLauncher.launch(uri)
+    }
+
+    fun requestSaveApps(items: List<AppItem>) {
+        val folder = ApplicationPreferences.get<String?>(ApplicationPreferences.SAVE_FOLDER_KEY, null)
+        val folderUri = folder?.toUri()
+        if ((folderUri != null) && (DocumentFile.fromTreeUri(activity, folderUri)?.canWrite() == true)) {
+            isSaving = true
+            doSaveApps(activity, items, scope) { isSaving = false }
+        } else {
+            launchFolderPicker(folderUri) { _ ->
+                isSaving = true
+                doSaveApps(activity, items, scope) { isSaving = false }
             }
         }
     }
@@ -218,19 +254,7 @@ fun MainScreen(
                         }
                         viewModel.loadData()
                     },
-                    onSave = {
-                        if (saveFolderUri == null) {
-                            showNoFolderDialog = true
-                        } else if (!DocumentFile.fromTreeUri(activity, saveFolderUri.toUri())!!.canWrite()) {
-                            activity.contentResolver.takePersistableUriPermission(
-                                saveFolderUri.toUri(),
-                                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                            )
-                        } else {
-                            isSaving = true
-                            doSaveApps(activity, selectedItems, scope) { isSaving = false }
-                        }
-                    },
+                    onSave = { requestSaveApps(selectedItems.toList()) },
                     onMarkDone = {
                         for (item in selectedItems) {
                             if (item.isAppUpdated) item.setBackupDone()
@@ -366,12 +390,7 @@ fun MainScreen(
                     text = { Text(pluralStringResource(R.plurals.save_app_package, item.apkCount, item.apkCount), style = MaterialTheme.typography.bodyLarge) },
                     onClick = {
                         contextMenuItem = null
-                        scope.launch {
-                            val folder = ApplicationPreferences.get<String?>(ApplicationPreferences.SAVE_FOLDER_KEY, null)
-                            if (folder != null && DocumentFile.fromTreeUri(activity, folder.toUri())!!.canWrite()) {
-                                doSaveApps(activity, listOf(item), scope) {}
-                            }
-                        }
+                        requestSaveApps(listOf(item))
                     }
                 )
                 AppContextMenuItem(
@@ -440,20 +459,6 @@ fun MainScreen(
             }
         }
     }
-    if (showNoFolderDialog) {
-        AlertDialog(
-            onDismissRequest = { showNoFolderDialog = false },
-            shape = MaterialTheme.shapes.large,
-            title = { Text(stringResource(R.string.information), style = MaterialTheme.typography.headlineSmall) },
-            text = { Text(stringResource(R.string.no_save_folder_selected), style = MaterialTheme.typography.bodyLarge) },
-            confirmButton = {
-                TextButton(onClick = { showNoFolderDialog = false }) {
-                    Text(stringResource(R.string.accept_button), style = MaterialTheme.typography.labelLarge)
-                }
-            }
-        )
-    }
-
     if (showBatteryOptimizationDialog) {
         AlertDialog(
             onDismissRequest = { showBatteryOptimizationDialog = false },
