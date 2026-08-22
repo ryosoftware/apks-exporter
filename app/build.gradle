@@ -16,8 +16,8 @@ android {
     defaultConfig {
         applicationId namespace
 
-        versionCode 200002000
-        versionName "2.2.0"
+        versionCode 200002001
+        versionName "2.2.1"
 
         minSdkVersion 33
         targetSdkVersion compileSdk
@@ -25,7 +25,7 @@ android {
         buildConfigField(
                 "String",
                 "TAG",
-                "\"APKsExporter\""
+                "\"apks_exporter\""
         )
     }
 
@@ -56,9 +56,9 @@ kotlin {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'androidx.appcompat:appcompat:1.8.0'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0"
-    implementation platform('androidx.compose:compose-bom:2026.06.01')
+    implementation platform('androidx.compose:compose-bom:2026.08.00')
     implementation 'androidx.compose.material3:material3'
     implementation 'androidx.compose.material:material-icons-core'
     implementation 'androidx.compose.ui:ui'
