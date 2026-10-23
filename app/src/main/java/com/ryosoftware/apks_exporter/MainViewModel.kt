@@ -101,17 +101,7 @@ class MainViewModel @Inject constructor(
 
                 if (currentPrefs[booleanPreferencesKey(ApplicationPreferences.IS_FIRST_APP_LAUNCH_TIME)] ?: true ||
                     currentPrefs[booleanPreferencesKey(ApplicationPreferences.SEED_BACKUP_DATA_FOR_ALL_APPS)] ?: false) {
-                    ApplicationPreferences.batch { edit ->
-                        for (packageInfo in packages) {
-                            edit[longPreferencesKey(MainService.getLastAppVersionNumberKey(packageInfo.packageName))] = packageInfo.longVersionCode
-                            edit[longPreferencesKey(MainService.getLastAppUpdateTimeKey(packageInfo.packageName))] = 0L
-                            edit[intPreferencesKey(MainService.getLastAppUpdateNotificationTimesKey(packageInfo.packageName))] = Int.MAX_VALUE
-                            edit[longPreferencesKey(MainService.getLastBackupVersionNumberKey(packageInfo.packageName))] = packageInfo.longVersionCode
-                            edit[longPreferencesKey(MainService.getLastBackupTimeKey(packageInfo.packageName))] = System.currentTimeMillis()
-                        }
-                        edit[booleanPreferencesKey(ApplicationPreferences.IS_FIRST_APP_LAUNCH_TIME)] = false
-                        edit[booleanPreferencesKey(ApplicationPreferences.SEED_BACKUP_DATA_FOR_ALL_APPS)] = false
-                    }
+                    MainService.instance.seedBackupDataForAllApps(context)
                 }
 
                 val showSystemPackages = currentPrefs[booleanPreferencesKey(ApplicationPreferences.SHOW_SYSTEM_PACKAGES_KEY)]

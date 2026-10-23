@@ -4,6 +4,9 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.text.format.DateUtils
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.documentfile.provider.DocumentFile
 import com.ryosoftware.utilities.*
 import java.io.File
@@ -336,5 +339,21 @@ class MainService @Inject constructor(
 
     fun getLastAppUpdateNotificationTimesKey(packageName: String) : String {
         return "$packageName-$LAST_APP_UPDATE_TIMES_NOTIFIED_SUFFIX"
+    }
+
+    suspend fun seedBackupDataForAllApps(context: Context) {
+        val packages = context.packageManager.getInstalledPackages(0)
+        ApplicationPreferences.batch { edit ->
+            for (packageInfo in packages) {
+                if (packageInfo.applicationInfo?.packageName == null) continue
+                edit[longPreferencesKey(getLastAppVersionNumberKey(packageInfo.packageName))] = packageInfo.longVersionCode
+                edit[longPreferencesKey(getLastAppUpdateTimeKey(packageInfo.packageName))] = 0L
+                edit[intPreferencesKey(getLastAppUpdateNotificationTimesKey(packageInfo.packageName))] = 0
+                edit[longPreferencesKey(getLastBackupVersionNumberKey(packageInfo.packageName))] = packageInfo.longVersionCode
+                edit[longPreferencesKey(getLastBackupTimeKey(packageInfo.packageName))] = System.currentTimeMillis()
+            }
+            edit[booleanPreferencesKey(ApplicationPreferences.IS_FIRST_APP_LAUNCH_TIME)] = false
+            edit[booleanPreferencesKey(ApplicationPreferences.SEED_BACKUP_DATA_FOR_ALL_APPS)] = false
+        }
     }
 }

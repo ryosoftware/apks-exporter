@@ -37,6 +37,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ryosoftware.utilities.PermissionUtilities
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.core.net.toUri
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -179,6 +183,7 @@ fun PreferencesScreen(onNavigateBack: () -> Unit) {
     }
     var showBackupWarningDialog by remember { mutableStateOf(false) }
     var isBackupRunning by rememberSaveable { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
     DisposableEffect(context) {
         val receiver = object : BroadcastReceiver() {
@@ -231,7 +236,9 @@ fun PreferencesScreen(onNavigateBack: () -> Unit) {
             },
             confirmButton = {
                 TextButton(onClick = {
-                    ApplicationPreferences.put(ApplicationPreferences.SEED_BACKUP_DATA_FOR_ALL_APPS, true)
+                    coroutineScope.launch(Dispatchers.IO) {
+                        MainService.instance.seedBackupDataForAllApps(context)
+                    }
                     showBackupWarningDialog = false
                     onNavigateBack()
                 }) {
