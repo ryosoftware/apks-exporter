@@ -36,14 +36,15 @@ class MainService @Inject constructor(
             LAST_BACKUP_TIME_SUFFIX,
             CAN_AUTOMATICALLY_BACKUP_SUFFIX
         )
-        private const val NOTIFY_UPDATED_INTERVAL = DateUtils.DAY_IN_MILLIS * 3
-        private const val NOTIFY_UPDATED_TIMES = 3
+        private const val NOTIFY_UPDATED_INTERVAL = DateUtils.DAY_IN_MILLIS * 5
+        private const val NOTIFY_UPDATED_TIMES = 5
+        
         private const val BASE_APK_FILENAME = "base.apk"
         const val REMOVABLE_SPLIT_PREFIX = "split_"
 
         fun isSystemApplication(packageInfo: PackageInfo): Boolean = instance.isSystemApplication(packageInfo)
         fun isSystemApplicationUpdated(packageInfo: PackageInfo): Boolean = instance.isSystemApplicationUpdated(packageInfo)
-        fun isAppUpdated(packageInfo: PackageInfo): Boolean = instance.isAppUpdated(packageInfo)
+        suspend fun isAppUpdated(packageInfo: PackageInfo): Boolean = instance.isAppUpdated(packageInfo)
         fun isAppBacked(packageInfo: PackageInfo): Boolean = instance.isAppBacked(packageInfo)
         suspend fun setBackupDone(packageInfo: PackageInfo) = instance.setBackupDone(packageInfo)
         fun canAutomaticallyBackup(packageInfo: PackageInfo): Boolean = instance.canAutomaticallyBackup(packageInfo)
@@ -58,7 +59,7 @@ class MainService @Inject constructor(
             autoEnableBackupForNewApps,
             autoBackupSystemApps
         )
-        fun incrementAppUpdateNotificationCount(packageName: String) = instance.incrementAppUpdateNotificationCount(packageName)
+        suspend fun incrementAppUpdateNotificationCount(packageName: String) = instance.incrementAppUpdateNotificationCount(packageName)
         suspend fun doBackup(context: Context, packageInfo: PackageInfo): Boolean = instance.doBackup(context, packageInfo)
         fun getLastBackupVersionNumberKey(packageName: String): String = instance.getLastBackupVersionNumberKey(packageName)
         fun getLastBackupTimeKey(packageName: String): String = instance.getLastBackupTimeKey(packageName)
@@ -94,22 +95,22 @@ class MainService @Inject constructor(
         return ApplicationPreferences.get(getLastBackupVersionNumberKey(packageInfo.packageName), 0L) == packageInfo.longVersionCode
     }
 
-    fun markAppUpdatedIfNeeded(packageInfo: PackageInfo) {
+    suspend fun markAppUpdatedIfNeeded(packageInfo: PackageInfo) {
         if (ApplicationPreferences.get(getLastAppVersionNumberKey(packageInfo.packageName), 0L) < packageInfo.longVersionCode) {
             setAppUpdated(packageInfo)
         }
     }
 
-    private fun setAppUpdated(packageInfo: PackageInfo) {
-        ApplicationPreferences.put(
+    private suspend fun setAppUpdated(packageInfo: PackageInfo) {
+        ApplicationPreferences.putSuspend(
             getLastAppVersionNumberKey(packageInfo.packageName),
             packageInfo.longVersionCode
         )
-        ApplicationPreferences.put(
+        ApplicationPreferences.putSuspend(
             getLastAppUpdateTimeKey(packageInfo.packageName),
             System.currentTimeMillis()
         )
-        ApplicationPreferences.put(
+        ApplicationPreferences.putSuspend(
             getLastAppUpdateNotificationTimesKey(packageInfo.packageName),
             0
         )
@@ -125,15 +126,15 @@ class MainService @Inject constructor(
         return timeRemaining || viewsRemaining
     }
 
-    fun isAppUpdated(packageInfo: PackageInfo): Boolean {
+    suspend fun isAppUpdated(packageInfo: PackageInfo): Boolean {
         markAppUpdatedIfNeeded(packageInfo)
         return computeIsAppUpdated(packageInfo)
     }
 
-    fun incrementAppUpdateNotificationCount(packageName: String) {
+    suspend fun incrementAppUpdateNotificationCount(packageName: String) {
         val key = getLastAppUpdateNotificationTimesKey(packageName)
         val currentCount = ApplicationPreferences.get(key, 0)
-        ApplicationPreferences.put(key, currentCount + 1)
+        ApplicationPreferences.putSuspend(key, currentCount + 1)
     }
 
     fun canAutomaticallyBackup(packageInfo: PackageInfo): Boolean =

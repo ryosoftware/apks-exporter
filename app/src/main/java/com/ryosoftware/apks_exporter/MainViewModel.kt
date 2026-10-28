@@ -220,10 +220,14 @@ class MainViewModel @Inject constructor(
         _isSelecting.value = true
     }
 
-    private fun incrementSeenCounts(items: List<AppItem>) {
-        for (item in items) {
-            if (item.isAppUpdated) {
-                MainService.incrementAppUpdateNotificationCount(item.packageName)
+    private suspend fun incrementSeenCounts(items: List<AppItem>) {
+        kotlinx.coroutines.coroutineScope {
+            for (item in items) {
+                if (item.isAppUpdated) {
+                    launch {
+                        MainService.instance.incrementAppUpdateNotificationCount(item.packageName)
+                    }
+                }
             }
         }
     }
