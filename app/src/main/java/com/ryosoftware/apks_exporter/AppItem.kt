@@ -19,7 +19,9 @@ data class AppItem(
     val stats: StorageStats?,
     val icon: Drawable?,
     val appLabel: String,
-    val resolvedCanAutomaticallyBackup: Boolean
+    val resolvedCanAutomaticallyBackup: Boolean,
+    val isAppUpdated: Boolean = false,
+    val isAppBacked: Boolean = false
 ) {
     val packageName: String get() = packageInfo.packageName
     val versionName: String? get() = packageInfo.versionName
@@ -28,8 +30,6 @@ data class AppItem(
     val isDisabled: Boolean get() = !(packageInfo.applicationInfo?.enabled ?: false)
     val isSystemApp: Boolean get() = MainService.isSystemApplication(packageInfo)
     val isUpdatedSystemApp: Boolean get() = MainService.isSystemApplicationUpdated(packageInfo)
-    val isAppUpdated: Boolean get() = MainService.isAppUpdated(packageInfo)
-    val isAppBacked: Boolean get() = MainService.isAppBacked(packageInfo)
     val apkCount: Int get() {
         val splits = packageInfo.applicationInfo?.splitSourceDirs
         return 1 + if (splits.isNullOrEmpty()) 0 else splits.size + 0

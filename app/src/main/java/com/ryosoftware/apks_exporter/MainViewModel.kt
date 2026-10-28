@@ -179,12 +179,18 @@ class MainViewModel @Inject constructor(
                         android.os.Process.myUserHandle()
                     ) } else null
 
+                    MainService.instance.markAppUpdatedIfNeeded(packageInfo)
+                    val isAppUpdated = MainService.instance.computeIsAppUpdated(packageInfo)
+                    val isAppBacked = MainService.instance.isAppBacked(packageInfo)
+
                     val item = AppItem(
                         packageInfo = packageInfo,
                         stats = stats,
                         icon = icon,
                         appLabel = appLabel,
-                        resolvedCanAutomaticallyBackup = canAutomaticallyBackup
+                        resolvedCanAutomaticallyBackup = canAutomaticallyBackup,
+                        isAppUpdated = isAppUpdated,
+                        isAppBacked = isAppBacked
                     )
                     result.add(item)
                 }

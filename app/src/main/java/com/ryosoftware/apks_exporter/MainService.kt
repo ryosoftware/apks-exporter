@@ -90,8 +90,14 @@ class MainService @Inject constructor(
         )
     }
 
-    fun isAppBacked(packageInfo: PackageInfo) : Boolean {
+    fun isAppBacked(packageInfo: PackageInfo): Boolean {
         return ApplicationPreferences.get(getLastBackupVersionNumberKey(packageInfo.packageName), 0L) == packageInfo.longVersionCode
+    }
+
+    fun markAppUpdatedIfNeeded(packageInfo: PackageInfo) {
+        if (ApplicationPreferences.get(getLastAppVersionNumberKey(packageInfo.packageName), 0L) < packageInfo.longVersionCode) {
+            setAppUpdated(packageInfo)
+        }
     }
 
     private fun setAppUpdated(packageInfo: PackageInfo) {
@@ -108,11 +114,8 @@ class MainService @Inject constructor(
             0
         )
     }
-    fun isAppUpdated(packageInfo: PackageInfo): Boolean {
-        if (ApplicationPreferences.get(getLastAppVersionNumberKey(packageInfo.packageName), 0L) < packageInfo.longVersionCode) {
-            setAppUpdated(packageInfo)
-        }
 
+    fun computeIsAppUpdated(packageInfo: PackageInfo): Boolean {
         val lastAppUpdateTimeKey = getLastAppUpdateTimeKey(packageInfo.packageName)
         val appUpdatedNotifiedTimesKey = getLastAppUpdateNotificationTimesKey(packageInfo.packageName)
 
@@ -120,6 +123,11 @@ class MainService @Inject constructor(
         val viewsRemaining = ApplicationPreferences.get(appUpdatedNotifiedTimesKey, 0) < NOTIFY_UPDATED_TIMES
 
         return timeRemaining || viewsRemaining
+    }
+
+    fun isAppUpdated(packageInfo: PackageInfo): Boolean {
+        markAppUpdatedIfNeeded(packageInfo)
+        return computeIsAppUpdated(packageInfo)
     }
 
     fun incrementAppUpdateNotificationCount(packageName: String) {
