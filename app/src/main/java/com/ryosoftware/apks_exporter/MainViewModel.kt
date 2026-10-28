@@ -39,7 +39,7 @@ class MainViewModel @Inject constructor(
 
     private val _baseItems = MutableStateFlow<List<AppItem>>(emptyList())
 
-    private val sortUpdatedAppsFirstFlow: StateFlow<Boolean> = ApplicationPreferences.observe(
+    private val _sortUpdatedAppsFirstFlow: StateFlow<Boolean> = ApplicationPreferences.observe(
         ApplicationPreferences.SORT_UPDATED_APPS_FIRST_KEY,
         ApplicationPreferences.SORT_UPDATED_APPS_FIRST_DEFAULT
     ).stateIn(
@@ -47,10 +47,11 @@ class MainViewModel @Inject constructor(
         SharingStarted.WhileSubscribed(5_000),
         ApplicationPreferences.SORT_UPDATED_APPS_FIRST_DEFAULT
     )
+    val sortUpdatedAppsFirst: StateFlow<Boolean> get() = _sortUpdatedAppsFirstFlow
 
     val items: StateFlow<List<AppItem>> = combine(
         _baseItems,
-        sortUpdatedAppsFirstFlow
+        _sortUpdatedAppsFirstFlow
     ) { baseItems, sortUpdatedAppsFirst ->
         if (!sortUpdatedAppsFirst) {
             baseItems.sortedWith { left, right -> collator.compare(left.appLabel, right.appLabel) }
@@ -107,6 +108,16 @@ class MainViewModel @Inject constructor(
             delay(100.milliseconds)
             val loadedItems = doLoad()
             _baseItems.value = loadedItems ?: emptyList()
+            val currentSelected = _selectedItems.value
+            if (currentSelected.isNotEmpty() && !_baseItems.value.isEmpty()) {
+                val byPackage = _baseItems.value.associateBy { it.packageName }
+                val remapped = currentSelected.mapNotNull { byPackage[it.packageName] }
+                _selectedItems.value = remapped
+                _isSelecting.value = remapped.isNotEmpty()
+            } else if (currentSelected.isNotEmpty() && _baseItems.value.isEmpty()) {
+                _selectedItems.value = emptyList()
+                _isSelecting.value = false
+            }
             if (loadedItems != null) {
                 incrementSeenCounts(loadedItems)
             }

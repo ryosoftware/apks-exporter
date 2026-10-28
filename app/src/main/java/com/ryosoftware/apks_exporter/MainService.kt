@@ -38,7 +38,7 @@ class MainService @Inject constructor(
         )
         private const val NOTIFY_UPDATED_INTERVAL = DateUtils.DAY_IN_MILLIS * 5
         private const val NOTIFY_UPDATED_TIMES = 5
-        
+
         private const val BASE_APK_FILENAME = "base.apk"
         const val REMOVABLE_SPLIT_PREFIX = "split_"
 

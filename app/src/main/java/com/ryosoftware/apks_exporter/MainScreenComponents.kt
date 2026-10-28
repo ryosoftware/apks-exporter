@@ -374,6 +374,7 @@ fun AppList(
     val listState = rememberLazyListState()
     val listScope = rememberCoroutineScope()
     var lettersHeight by remember { mutableStateOf(0f) }
+    val sortUpdatedAppsFirst by viewModel.sortUpdatedAppsFirst.collectAsStateWithLifecycle()
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             state = listState,
@@ -388,44 +389,47 @@ fun AppList(
             }
         }
 
-        val letters = remember(items.toList()) {
-            items.map { it.appLabel.first().uppercaseChar() }.distinct().sorted()
-        }
+        if (!sortUpdatedAppsFirst) {
+            val letters = remember(items.toList()) {
+                items.map { it.appLabel.firstOrNull()?.uppercaseChar() ?: '#' }.distinct().sorted()
+            }
 
-        Box(
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .width(24.dp)
-                .fillMaxHeight()
-                .onSizeChanged { lettersHeight = it.height.toFloat() }
-                .pointerInput(lettersHeight) {
-                    detectTapGestures { offset ->
-                        val index = if (lettersHeight > 0) {
-                            (offset.y / lettersHeight * letters.size).toInt()
-                                .coerceIn(0, letters.size - 1)
-                        } else 0
-                        val letter = letters[index]
-                        val targetIndex = items.indexOfFirst {
-                            it.appLabel.first().uppercaseChar() >= letter
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .width(24.dp)
+                    .fillMaxHeight()
+                    .onSizeChanged { lettersHeight = it.height.toFloat() }
+                    .pointerInput(lettersHeight) {
+                        detectTapGestures { offset ->
+                            val index = if (lettersHeight > 0 && letters.isNotEmpty()) {
+                                (offset.y / lettersHeight * letters.size).toInt()
+                                    .coerceIn(0, letters.size - 1)
+                            } else 0
+                            if (letters.isEmpty()) return@detectTapGestures
+                            val letter = letters[index]
+                            val targetIndex = items.indexOfFirst {
+                                (it.appLabel.firstOrNull()?.uppercaseChar() ?: '#') >= letter
+                            }
+                            if (targetIndex >= 0) {
+                                listScope.launch { listState.animateScrollToItem(targetIndex) }
+                            }
                         }
-                        if (targetIndex >= 0) {
-                            listScope.launch { listState.animateScrollToItem(targetIndex) }
-                        }
-                    }
-                },
-            contentAlignment = Alignment.Center
-        ) {
-            Column(
-                verticalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier.fillMaxHeight()
+                    },
+                contentAlignment = Alignment.Center
             ) {
-                for (letter in letters) {
-                    Text(
-                        text = letter.toString(),
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                Column(
+                    verticalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier.fillMaxHeight()
+                ) {
+                    for (letter in letters) {
+                        Text(
+                            text = letter.toString(),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
         }
