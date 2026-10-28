@@ -58,7 +58,7 @@ data class AppItem(
         } else {
             resolvedCanAutomaticallyBackup
         }
-    fun canAutomaticallyBackup(value: Boolean) = MainService.canAutomaticallyBackup(packageInfo, value)
+    suspend fun canAutomaticallyBackup(value: Boolean) = MainService.canAutomaticallyBackup(packageInfo, value)
     fun observeCanAutomaticallyBackup(): Flow<Boolean> = ApplicationPreferences.observe(
         MainService.getCanAutomaticallyBackupAppKey(packageName), resolvedCanAutomaticallyBackup
     )

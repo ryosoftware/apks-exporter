@@ -670,13 +670,16 @@ fun AppCard(
                         )
                     }
                     if (autoBackupEnabled && (!autoBackupApp)) {
+                        val badgeScope = rememberCoroutineScope()
                         StatusBadge(
                             icon = painterResource(R.drawable.ic_auto_backup_off),
                             containerColor = MaterialTheme.colorScheme.error,
                             label = stringResource(R.string.badge_autobackup_off),
                             onClick = {
-                                item.canAutomaticallyBackup(true)
-                                autoBackupApp = true
+                                badgeScope.launch {
+                                    item.canAutomaticallyBackup(true)
+                                    autoBackupApp = true
+                                }
                             }
                         )
                     }

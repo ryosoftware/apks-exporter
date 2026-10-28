@@ -243,16 +243,20 @@ fun MainScreen(
                         }
                     },
                     onAutoOn = {
-                        for (item in selectedItems) {
-                            item.canAutomaticallyBackup(true)
+                        scope.launch {
+                            for (item in selectedItems) {
+                                item.canAutomaticallyBackup(true)
+                            }
+                            viewModel.loadData()
                         }
-                        viewModel.loadData()
                     },
                     onAutoOff = {
-                        for (item in selectedItems) {
-                            item.canAutomaticallyBackup(false)
+                        scope.launch {
+                            for (item in selectedItems) {
+                                item.canAutomaticallyBackup(false)
+                            }
+                            viewModel.loadData()
                         }
-                        viewModel.loadData()
                     },
                     onSave = { requestSaveApps(selectedItems.toList()) },
                     onMarkDone = {
@@ -441,8 +445,10 @@ fun MainScreen(
                             .fillMaxWidth()
                             .clickable {
                                 contextMenuItem = null
-                                item.canAutomaticallyBackup(!item.canAutomaticallyBackup())
-                                scope.launch { viewModel.loadData() }
+                                scope.launch {
+                                    item.canAutomaticallyBackup(!item.canAutomaticallyBackup())
+                                    viewModel.loadData()
+                                }
                             }
                             .padding(horizontal = 24.dp, vertical = 12.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -453,7 +459,10 @@ fun MainScreen(
                             checked = item.canAutomaticallyBackup(),
                             onCheckedChange = {
                                 contextMenuItem = null
-                                item.canAutomaticallyBackup(!item.canAutomaticallyBackup())
+                                scope.launch {
+                                    item.canAutomaticallyBackup(!item.canAutomaticallyBackup())
+                                    viewModel.loadData()
+                                }
                             }
                         )
                     }

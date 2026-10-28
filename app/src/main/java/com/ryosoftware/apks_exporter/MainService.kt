@@ -47,7 +47,7 @@ class MainService @Inject constructor(
         fun isAppBacked(packageInfo: PackageInfo): Boolean = instance.isAppBacked(packageInfo)
         suspend fun setBackupDone(packageInfo: PackageInfo) = instance.setBackupDone(packageInfo)
         fun canAutomaticallyBackup(packageInfo: PackageInfo): Boolean = instance.canAutomaticallyBackup(packageInfo)
-        fun canAutomaticallyBackup(packageInfo: PackageInfo, value: Boolean) = instance.canAutomaticallyBackup(packageInfo, value)
+        suspend fun canAutomaticallyBackup(packageInfo: PackageInfo, value: Boolean) = instance.canAutomaticallyBackup(packageInfo, value)
         fun hasAutoBackupPreference(packageInfo: PackageInfo): Boolean = instance.hasAutoBackupPreference(packageInfo)
         fun resolveAutoBackupPreference(
             packageInfo: PackageInfo,
@@ -134,8 +134,8 @@ class MainService @Inject constructor(
             true
         )
 
-    fun canAutomaticallyBackup(packageInfo: PackageInfo, value: Boolean) {
-        ApplicationPreferences.put(
+    suspend fun canAutomaticallyBackup(packageInfo: PackageInfo, value: Boolean) {
+        ApplicationPreferences.putSuspend(
             getCanAutomaticallyBackupAppKey(packageInfo.packageName),
             value
         )
