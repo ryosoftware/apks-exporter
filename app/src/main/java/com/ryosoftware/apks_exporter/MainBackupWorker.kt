@@ -156,9 +156,9 @@ class MainBackupWorker @AssistedInject constructor(
         return notification.build()
     }
 
-    fun persistAutoBackupAppsData(backedApps: Map<String, String>, errors: Int) {
-        ApplicationPreferences.put(ApplicationPreferences.LAST_BACKED_APP_PACKAGES_KEY, JSONObject(backedApps).toString())
-        ApplicationPreferences.put(ApplicationPreferences.LAST_BACKUP_ERRORS_COUNT_KEY, errors)
+    suspend fun persistAutoBackupAppsData(backedApps: Map<String, String>, errors: Int) {
+        ApplicationPreferences.putSuspend(ApplicationPreferences.LAST_BACKED_APP_PACKAGES_KEY, JSONObject(backedApps).toString())
+        ApplicationPreferences.putSuspend(ApplicationPreferences.LAST_BACKUP_ERRORS_COUNT_KEY, errors)
     }
 
     private fun getPersistedAutoBackupAppsData(): Pair<MutableMap<String, String>, Int> {
@@ -174,7 +174,7 @@ class MainBackupWorker @AssistedInject constructor(
     }
 
     @SuppressLint("MissingPermission")
-    private fun doAutoBackupApps() {
+    private suspend fun doAutoBackupApps() {
         if (!ApplicationPreferences.get(
                 ApplicationPreferences.AUTO_BACKUP_APPS_KEY,
                 ApplicationPreferences.AUTO_BACKUP_APPS_DEFAULT)) return
@@ -203,11 +203,11 @@ class MainBackupWorker @AssistedInject constructor(
         }
 
         val now = System.currentTimeMillis()
-        ApplicationPreferences.put(ApplicationPreferences.LAST_AUTO_BACKUP_TIME_KEY, now)
+        ApplicationPreferences.putSuspend(ApplicationPreferences.LAST_AUTO_BACKUP_TIME_KEY, now)
         persistAutoBackupAppsData(backedApps, errors)
 
         val autoBackupResultString = getBackedAppsNotificationBody(backedApps, crash, errors)
-        ApplicationPreferences.put(ApplicationPreferences.LAST_BACKUP_RESULTS_KEY, autoBackupResultString)
+        ApplicationPreferences.putSuspend(ApplicationPreferences.LAST_BACKUP_RESULTS_KEY, autoBackupResultString)
 
         val notificationWillBePosted = crash || (!appsToBeBacked.isNullOrEmpty()) || backedApps.isEmpty()
         if (notificationWillBePosted && PermissionUtilities.permissionGranted(applicationContext, Manifest.permission.POST_NOTIFICATIONS)) {

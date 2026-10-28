@@ -45,7 +45,7 @@ class MainService @Inject constructor(
         fun isSystemApplicationUpdated(packageInfo: PackageInfo): Boolean = instance.isSystemApplicationUpdated(packageInfo)
         fun isAppUpdated(packageInfo: PackageInfo): Boolean = instance.isAppUpdated(packageInfo)
         fun isAppBacked(packageInfo: PackageInfo): Boolean = instance.isAppBacked(packageInfo)
-        fun setBackupDone(packageInfo: PackageInfo) = instance.setBackupDone(packageInfo)
+        suspend fun setBackupDone(packageInfo: PackageInfo) = instance.setBackupDone(packageInfo)
         fun canAutomaticallyBackup(packageInfo: PackageInfo): Boolean = instance.canAutomaticallyBackup(packageInfo)
         fun canAutomaticallyBackup(packageInfo: PackageInfo, value: Boolean) = instance.canAutomaticallyBackup(packageInfo, value)
         fun hasAutoBackupPreference(packageInfo: PackageInfo): Boolean = instance.hasAutoBackupPreference(packageInfo)
@@ -59,7 +59,7 @@ class MainService @Inject constructor(
             autoBackupSystemApps
         )
         fun incrementAppUpdateNotificationCount(packageName: String) = instance.incrementAppUpdateNotificationCount(packageName)
-        fun doBackup(context: Context, packageInfo: PackageInfo): Boolean = instance.doBackup(context, packageInfo)
+        suspend fun doBackup(context: Context, packageInfo: PackageInfo): Boolean = instance.doBackup(context, packageInfo)
         fun getLastBackupVersionNumberKey(packageName: String): String = instance.getLastBackupVersionNumberKey(packageName)
         fun getLastBackupTimeKey(packageName: String): String = instance.getLastBackupTimeKey(packageName)
         fun getCanAutomaticallyBackupAppKey(packageName: String): String = instance.getCanAutomaticallyBackupAppKey(packageName)
@@ -79,12 +79,12 @@ class MainService @Inject constructor(
         (packageInfo.applicationInfo != null) &&
                 ((packageInfo.applicationInfo!!.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) == ApplicationInfo.FLAG_UPDATED_SYSTEM_APP)
 
-    fun setBackupDone(packageInfo: PackageInfo) {
-        ApplicationPreferences.put(
+    suspend fun setBackupDone(packageInfo: PackageInfo) {
+        ApplicationPreferences.putSuspend(
             getLastBackupVersionNumberKey(packageInfo.packageName),
             packageInfo.longVersionCode
         )
-        ApplicationPreferences.put(
+        ApplicationPreferences.putSuspend(
             getLastBackupTimeKey(packageInfo.packageName),
             System.currentTimeMillis()
         )
@@ -224,7 +224,7 @@ class MainService @Inject constructor(
         }
     }
 
-    fun doBackup(context: Context, packageInfo: PackageInfo): Boolean {
+    suspend fun doBackup(context: Context, packageInfo: PackageInfo): Boolean {
         try {
             val backupsFolder = ApplicationPreferences.get<String?>(ApplicationPreferences.SAVE_FOLDER_KEY, null)
                 ?: return false

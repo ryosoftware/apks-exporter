@@ -143,11 +143,11 @@ fun MainScreen(
         val folderUri = folder?.toUri()
         if ((folderUri != null) && (DocumentFile.fromTreeUri(activity, folderUri)?.canWrite() == true)) {
             isSaving = true
-            doSaveApps(activity, items, scope) { isSaving = false }
+                doSaveApps(activity, items, viewModel, scope) { isSaving = false }
         } else {
             launchFolderPicker(folderUri) { _ ->
                 isSaving = true
-                doSaveApps(activity, items, scope) { isSaving = false }
+            doSaveApps(activity, items, viewModel, scope) { isSaving = false }
             }
         }
     }
@@ -256,11 +256,13 @@ fun MainScreen(
                     },
                     onSave = { requestSaveApps(selectedItems.toList()) },
                     onMarkDone = {
-                        for (item in selectedItems) {
-                            if (item.isAppUpdated) item.setBackupDone()
+                        scope.launch {
+                            for (item in selectedItems) {
+                                if (item.isAppUpdated) item.setBackupDone()
+                            }
+                            viewModel.cancelSelection()
+                            viewModel.loadData()
                         }
-                        viewModel.cancelSelection()
-                        viewModel.loadData()
                     }
                 )
             }
@@ -488,6 +490,7 @@ fun MainScreen(
 private fun doSaveApps(
     activity: Activity,
     items: List<AppItem>,
+    viewModel: MainViewModel,
     scope: kotlinx.coroutines.CoroutineScope,
     onFinish: () -> Unit
 ) {
@@ -505,6 +508,7 @@ private fun doSaveApps(
             if (success) R.string.operation_done else R.string.cant_complete_requested_operation,
             Toast.LENGTH_LONG
         ).show()
+        viewModel.loadData()
         activity.sendBroadcast(Intent(ACTION_SAVE_TASKS_FINISHED))
     }
 }

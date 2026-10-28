@@ -62,7 +62,7 @@ data class AppItem(
     fun observeCanAutomaticallyBackup(): Flow<Boolean> = ApplicationPreferences.observe(
         MainService.getCanAutomaticallyBackupAppKey(packageName), resolvedCanAutomaticallyBackup
     )
-    fun setBackupDone() = MainService.setBackupDone(packageInfo)
+    suspend fun setBackupDone() = MainService.setBackupDone(packageInfo)
 
     fun uninstallApp(activity: Activity) {
         try {

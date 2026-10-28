@@ -35,8 +35,38 @@ class MainViewModel @Inject constructor(
     application: Application,
     private val savedStateHandle: SavedStateHandle
 ) : AndroidViewModel(application) {
-    private val _items = MutableStateFlow<List<AppItem>>(emptyList())
-    val items: StateFlow<List<AppItem>> = _items.asStateFlow()
+    private val collator = Collator.getInstance()
+
+    private val _baseItems = MutableStateFlow<List<AppItem>>(emptyList())
+
+    private val sortUpdatedAppsFirstFlow: StateFlow<Boolean> = ApplicationPreferences.observe(
+        ApplicationPreferences.SORT_UPDATED_APPS_FIRST_KEY,
+        ApplicationPreferences.SORT_UPDATED_APPS_FIRST_DEFAULT
+    ).stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        ApplicationPreferences.SORT_UPDATED_APPS_FIRST_DEFAULT
+    )
+
+    val items: StateFlow<List<AppItem>> = combine(
+        _baseItems,
+        sortUpdatedAppsFirstFlow
+    ) { baseItems, sortUpdatedAppsFirst ->
+        if (!sortUpdatedAppsFirst) {
+            baseItems.sortedWith { left, right -> collator.compare(left.appLabel, right.appLabel) }
+        } else {
+            baseItems.sortedWith { left, right ->
+                val leftUpdatedAndNotBacked = left.isAppUpdated && !left.isAppBacked
+                val rightUpdatedAndNotBacked = right.isAppUpdated && !right.isAppBacked
+                when {
+                    leftUpdatedAndNotBacked != rightUpdatedAndNotBacked -> {
+                        if (leftUpdatedAndNotBacked) -1 else 1
+                    }
+                    else -> collator.compare(left.appLabel, right.appLabel)
+                }
+            }
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -56,7 +86,7 @@ class MainViewModel @Inject constructor(
     private val iconCache = HashMap<String, Drawable>()
 
     val filteredItems: StateFlow<List<AppItem>> = combine(
-        _items,
+        items,
         _searchText
     ) { items, searchText ->
         val query = searchText?.lowercase()
@@ -76,7 +106,7 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             delay(100.milliseconds)
             val loadedItems = doLoad()
-            _items.value = loadedItems ?: emptyList()
+            _baseItems.value = loadedItems ?: emptyList()
             if (loadedItems != null) {
                 incrementSeenCounts(loadedItems)
             }
@@ -161,22 +191,7 @@ class MainViewModel @Inject constructor(
 
                 ApplicationPreferences.cleanupOrphanedPreferences(packages)
 
-                val sortStates = result.map { it.isAppUpdated to it.isAppBacked }
-
-                val sorted = result.withIndex().sortedWith { (leftIdx, left), (rightIdx, right) ->
-                    val (leftUpdated, leftBacked) = sortStates[leftIdx]
-                    val (rightUpdated, rightBacked) = sortStates[rightIdx]
-                    val leftUpdatedAndNotBacked = leftUpdated && !leftBacked
-                    val rightUpdatedAndNotBacked = rightUpdated && !rightBacked
-                    if (!sortUpdatedAppsFirst || leftUpdatedAndNotBacked == rightUpdatedAndNotBacked) {
-                        Collator.getInstance().compare(left.appLabel, right.appLabel)
-                    } else {
-                        if (leftUpdatedAndNotBacked) -1 else 1
-                    }
-                }
-
-                result.clear()
-                result.addAll(sorted.map { it.value })
+                result.sortWith { left, right -> collator.compare(left.appLabel, right.appLabel) }
 
                 return@withContext result
             } catch (e: Exception) {
@@ -208,7 +223,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun selectAll() {
-        _selectedItems.value = _items.value
+        _selectedItems.value = items.value
         _isSelecting.value = true
     }
 
