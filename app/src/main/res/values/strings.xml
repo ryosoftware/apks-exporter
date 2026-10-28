@@ -59,12 +59,17 @@
     <string name="automation">Automation</string>
 
     <string name="auto_backup_apps">Auto backup Apps</string>
-    <string name="auto_backup_apps_on">Automatically save the APKs of apps that are installed or updated (following the display preferences selected above). A background process will run periodically and check which apps meet the criteria (if an app is updated multiple times during that period, part of its history will be lost).</string>    <string name="auto_backup_apps_off">Do not automatically save APKs for apps that are installed or updated</string>
+    <string name="auto_backup_apps_on">Automatically save the APKs of apps that are installed or updated. The apps included are controlled by the options in this section and by each app\'s automatic backup setting. A background process will run periodically and check which apps meet the criteria (if an app is updated multiple times during that period, part of its history will be lost).</string>
+    <string name="auto_backup_apps_off">Do not automatically save APKs for apps that are installed or updated</string>
     <string name="can_automatically_backup">Automatize App backup</string>
 
     <string name="auto_enable_new_apps">New installed Apps</string>
     <string name="auto_enable_new_apps_on">Newly installed apps will have automatic backup enabled by default</string>
     <string name="auto_enable_new_apps_off">Newly installed apps will not have automatic backup enabled by default</string>
+
+    <string name="auto_backup_system_apps">System apps</string>
+    <string name="auto_backup_system_apps_on">All system apps will have automatic backup enabled by default</string>
+    <string name="auto_backup_system_apps_off">System apps will not have automatic backup enabled by default</string>
 
     <string name="force_backup_now">Create pending backups now</string>
     <string name="auto_backup_last_date">Last process execution time: %1$s</string>
@@ -190,7 +195,7 @@
     <string name="manage_all_files">Manage all files</string>
     <string name="install_source">Installed from</string>
     <string name="backup_warning_title">Settings changed</string>
-    <string name="backup_warning_message">You have enabled automatic backup and/or changed app visibility settings. This may cause unwanted backups of many apps. Do you want to mark all current apps as already backed up?</string>
+    <string name="backup_warning_message">You have enabled automatic backup and/or changed settings that affect which apps are backed up automatically. This may cause unwanted backups of many apps. Do you want to mark all current apps as already backed up?</string>
     <string name="backup_warning_skip">Yes, skip backup</string>
     <string name="backup_warning_continue">No, continue</string>
     <string name="backup_warning_continue_editing">Continue editing</string>

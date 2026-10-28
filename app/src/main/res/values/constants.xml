@@ -13,6 +13,7 @@
     <string name="sort_updated_apps_first_default">true</string>
     <string name="auto_backup_apps_default">false</string>
     <string name="auto_backup_new_apps_default">true</string>
+    <string name="auto_backup_system_apps_default">false</string>
     <string name="theme_default">system</string>
     <string name="black_background_default">false</string>
     <string name="use_system_accent_color_default">false</string>

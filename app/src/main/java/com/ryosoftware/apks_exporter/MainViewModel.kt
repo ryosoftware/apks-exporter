@@ -114,13 +114,20 @@ class MainViewModel @Inject constructor(
                     ?: ApplicationPreferences.AUTO_BACKUP_APPS_DEFAULT
                 val autoEnableBackupForNewApps = currentPrefs[booleanPreferencesKey(ApplicationPreferences.AUTO_BACKUP_NEW_APPS_KEY)]
                     ?: ApplicationPreferences.AUTO_BACKUP_NEW_APPS_DEFAULT
+                val autoBackupSystemApps = currentPrefs[booleanPreferencesKey(ApplicationPreferences.AUTO_BACKUP_SYSTEM_APPS_KEY)]
+                    ?: ApplicationPreferences.AUTO_BACKUP_SYSTEM_APPS_DEFAULT
+                val autoBackupSystemAppsEffective = showSystemPackages && autoBackupSystemApps
                 val showDisabledApps = currentPrefs[booleanPreferencesKey(ApplicationPreferences.SHOW_DISABLED_APPS_KEY)]
                     ?: ApplicationPreferences.SHOW_DISABLED_APPS_DEFAULT
 
                 val result = mutableListOf<AppItem>()
                 for (packageInfo in packages) {
                     if (packageInfo.applicationInfo?.packageName == null) continue
-                    val canAutomaticallyBackup = MainService.resolveAutoBackupPreference(packageInfo, autoEnableBackupForNewApps)
+                    val canAutomaticallyBackup = MainService.resolveAutoBackupPreference(
+                        packageInfo,
+                        autoEnableBackupForNewApps,
+                        autoBackupSystemAppsEffective
+                    )
                     val isSystemApp = MainService.isSystemApplication(packageInfo)
                     val autoBackupEnabledForThis = autoEnableBackup && canAutomaticallyBackup
                     if (!showDisabledApps && !autoBackupEnabledForThis && (packageInfo.applicationInfo?.enabled == false)) continue
@@ -146,7 +153,8 @@ class MainViewModel @Inject constructor(
                         packageInfo = packageInfo,
                         stats = stats,
                         icon = icon,
-                        appLabel = appLabel
+                        appLabel = appLabel,
+                        resolvedCanAutomaticallyBackup = canAutomaticallyBackup
                     )
                     result.add(item)
                 }

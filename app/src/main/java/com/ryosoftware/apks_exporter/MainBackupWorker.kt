@@ -65,15 +65,23 @@ class MainBackupWorker @AssistedInject constructor(
             ApplicationPreferences.AUTO_BACKUP_NEW_APPS_KEY,
             ApplicationPreferences.AUTO_BACKUP_NEW_APPS_DEFAULT
         )
-        val showDisabledApps = ApplicationPreferences.get(
-            ApplicationPreferences.SHOW_DISABLED_APPS_KEY,
-            ApplicationPreferences.SHOW_DISABLED_APPS_DEFAULT
+        val autoBackupSystemApps = ApplicationPreferences.get(
+            ApplicationPreferences.AUTO_BACKUP_SYSTEM_APPS_KEY,
+            ApplicationPreferences.AUTO_BACKUP_SYSTEM_APPS_DEFAULT
         )
+        val showSystemPackages = ApplicationPreferences.get(
+            ApplicationPreferences.SHOW_SYSTEM_PACKAGES_KEY,
+            ApplicationPreferences.SHOW_SYSTEM_PACKAGES_DEFAULT
+        )
+        val autoBackupSystemAppsEffective = showSystemPackages && autoBackupSystemApps
         val appsToBeBacked = mutableListOf<PackageInfo>()
         for (packageInfo in allPackages) {
             if (packageInfo.applicationInfo?.packageName == null) continue
-            val canAutoBackup = MainService.resolveAutoBackupPreference(packageInfo, autoEnableBackupForNewApps)
-            if (!canAutoBackup && !showDisabledApps && (packageInfo.applicationInfo?.enabled == false)) continue
+            val canAutoBackup = MainService.resolveAutoBackupPreference(
+                packageInfo,
+                autoEnableBackupForNewApps,
+                autoBackupSystemAppsEffective
+            )
             if (!canAutoBackup) continue
             if (MainService.isAppBacked(packageInfo)) continue
             appsToBeBacked.add(packageInfo)

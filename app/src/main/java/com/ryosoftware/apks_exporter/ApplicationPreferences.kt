@@ -1,6 +1,7 @@
 package com.ryosoftware.apks_exporter
 
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
@@ -37,6 +38,7 @@ class ApplicationPreferences @Inject constructor(
         const val SAVE_FOLDER_KEY = "save-folder"
         const val AUTO_BACKUP_APPS_KEY = "auto-backup-apps"
         const val AUTO_BACKUP_NEW_APPS_KEY = "auto-backup-new-apps"
+        const val AUTO_BACKUP_SYSTEM_APPS_KEY = "auto-backup-system-apps"
         const val THEME_KEY = "theme"
         const val THEME_DARK = "dark"
         const val THEME_LIGHT = "light"
@@ -50,7 +52,8 @@ class ApplicationPreferences @Inject constructor(
         const val LAST_BACKED_APP_PACKAGES_KEY = "last-backed-app-packages"
         const val LAST_BACKUP_ERRORS_COUNT_KEY = "last-backup-errors-count"
         private const val VERSION_KEY = "version"
-        private const val VERSION_VALUE = 1.1f
+        private const val VERSION_VALUE = 1.2f
+        private const val SYSTEM_APPS_AUTO_BACKUP_MIGRATION_VERSION = 1.2f
 
         // Forwarding vars (delegates to instance for runtime-initialized values)
         var SHOW_SYSTEM_PACKAGES_DEFAULT: Boolean
@@ -86,6 +89,9 @@ class ApplicationPreferences @Inject constructor(
         var AUTO_BACKUP_NEW_APPS_DEFAULT: Boolean
             get() = instance.AUTO_BACKUP_NEW_APPS_DEFAULT
             set(v) { instance.AUTO_BACKUP_NEW_APPS_DEFAULT = v }
+        var AUTO_BACKUP_SYSTEM_APPS_DEFAULT: Boolean
+            get() = instance.AUTO_BACKUP_SYSTEM_APPS_DEFAULT
+            set(v) { instance.AUTO_BACKUP_SYSTEM_APPS_DEFAULT = v }
         val THEME_VALUES: Array<String> get() = instance.THEME_VALUES
         var THEME_DEFAULT: String
             get() = instance.THEME_DEFAULT
@@ -124,6 +130,7 @@ class ApplicationPreferences @Inject constructor(
     var SORT_UPDATED_APPS_FIRST_DEFAULT = false
     var AUTO_BACKUP_APPS_DEFAULT = false
     var AUTO_BACKUP_NEW_APPS_DEFAULT = true
+    var AUTO_BACKUP_SYSTEM_APPS_DEFAULT = false
     val THEME_VALUES = arrayOf(THEME_DARK, THEME_LIGHT, THEME_SYSTEM)
     var THEME_DEFAULT = THEME_SYSTEM
     var BLACK_BACKGROUND_DEFAULT = false
@@ -138,14 +145,42 @@ class ApplicationPreferences @Inject constructor(
     @PublishedApi
     internal val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    private fun upgrade(edit: MutablePreferences, fromVersion: Float) {
+    private fun upgrade(
+        edit: MutablePreferences,
+        fromVersion: Float,
+        systemPackageNames: Set<String>
+    ) {
+        if (fromVersion < SYSTEM_APPS_AUTO_BACKUP_MIGRATION_VERSION) {
+            for (packageName in systemPackageNames) {
+                val key = booleanPreferencesKey(MainService.getCanAutomaticallyBackupAppKey(packageName))
+                if (edit[key] == false) {
+                    edit.remove(key)
+                }
+            }
+        }
     }
 
     fun initialize() {
         initializeConstants()
         scope.launch {
-            val currentVersion = dataStore.data.first()[floatPreferencesKey(VERSION_KEY)] ?: 0f
+            val currentPreferences = dataStore.data.first()
+            val obsoleteUpdatedSystemAppsKey = booleanPreferencesKey("auto-backup-updated-system-apps")
+            if (currentPreferences.contains(obsoleteUpdatedSystemAppsKey)) {
+                dataStore.edit { edit -> edit.remove(obsoleteUpdatedSystemAppsKey) }
+            }
+            val currentVersion = currentPreferences[floatPreferencesKey(VERSION_KEY)] ?: 0f
             if (currentVersion != VERSION_VALUE) {
+                val systemPackageNames = if (currentVersion < SYSTEM_APPS_AUTO_BACKUP_MIGRATION_VERSION) {
+                    context.packageManager.getInstalledPackages(0)
+                        .filter {
+                            val flags = it.applicationInfo?.flags ?: 0
+                            (flags and ApplicationInfo.FLAG_SYSTEM) != 0
+                        }
+                        .mapNotNull { it.applicationInfo?.packageName }
+                        .toSet()
+                } else {
+                    emptySet()
+                }
                 if (currentVersion == 0f) {
                     val oldPrefs = context.getSharedPreferences(
                         "${context.packageName}_preferences", Context.MODE_PRIVATE
@@ -162,14 +197,16 @@ class ApplicationPreferences @Inject constructor(
                                     is Float -> edit[floatPreferencesKey(key)] = value
                                 }
                             }
-                            upgrade(edit, currentVersion)
+                            upgrade(edit, currentVersion, systemPackageNames)
                             edit[floatPreferencesKey(VERSION_KEY)] = VERSION_VALUE
                         }
                         return@launch
                     }
                 }
                 dataStore.edit { edit ->
-                    if (currentVersion < VERSION_VALUE) upgrade(edit, currentVersion)
+                    if (currentVersion < VERSION_VALUE) {
+                        upgrade(edit, currentVersion, systemPackageNames)
+                    }
                     edit[floatPreferencesKey(VERSION_KEY)] = VERSION_VALUE
                 }
             }
@@ -188,6 +225,7 @@ class ApplicationPreferences @Inject constructor(
         SORT_UPDATED_APPS_FIRST_DEFAULT = java.lang.Boolean.parseBoolean(context.getString(R.string.sort_updated_apps_first_default))
         AUTO_BACKUP_APPS_DEFAULT = java.lang.Boolean.parseBoolean(context.getString(R.string.auto_backup_apps_default))
         AUTO_BACKUP_NEW_APPS_DEFAULT = java.lang.Boolean.parseBoolean((context.getString(R.string.auto_backup_new_apps_default)))
+        AUTO_BACKUP_SYSTEM_APPS_DEFAULT = java.lang.Boolean.parseBoolean(context.getString(R.string.auto_backup_system_apps_default))
         val themeDefault = context.getString(R.string.theme_default)
         if (themeDefault in THEME_VALUES) THEME_DEFAULT = themeDefault
         BLACK_BACKGROUND_DEFAULT = java.lang.Boolean.parseBoolean(context.getString(R.string.black_background_default))

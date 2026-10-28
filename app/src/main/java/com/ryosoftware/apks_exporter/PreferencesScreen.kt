@@ -95,6 +95,10 @@ fun PreferencesScreen(onNavigateBack: () -> Unit) {
         ApplicationPreferences.AUTO_BACKUP_NEW_APPS_KEY,
         ApplicationPreferences.AUTO_BACKUP_NEW_APPS_DEFAULT
     ).collectAsStateWithLifecycle(initialValue = ApplicationPreferences.AUTO_BACKUP_NEW_APPS_DEFAULT)
+    val autoBackupSystemAppsFlow by ApplicationPreferences.observe(
+        ApplicationPreferences.AUTO_BACKUP_SYSTEM_APPS_KEY,
+        ApplicationPreferences.AUTO_BACKUP_SYSTEM_APPS_DEFAULT
+    ).collectAsStateWithLifecycle(initialValue = ApplicationPreferences.AUTO_BACKUP_SYSTEM_APPS_DEFAULT)
     val themeFlow by ApplicationPreferences.observe(
         ApplicationPreferences.THEME_KEY,
         ApplicationPreferences.THEME_DEFAULT
@@ -128,6 +132,7 @@ fun PreferencesScreen(onNavigateBack: () -> Unit) {
     var sortUpdatedAppsFirst by remember { mutableStateOf(sortUpdatedAppsFirstFlow) }
     var autoBackupApps by remember { mutableStateOf(autoBackupAppsFlow) }
     var autoBackupForNewApps by remember { mutableStateOf(autoEnableNewAppsFlow) }
+    var autoBackupSystemApps by remember { mutableStateOf(autoBackupSystemAppsFlow) }
     var theme by remember { mutableStateOf(themeFlow) }
     var blackBackground by remember { mutableStateOf(blackBackgroundFlow) }
     var useSystemAccentColor by remember { mutableStateOf(useSystemAccentColorFlow) }
@@ -143,6 +148,7 @@ fun PreferencesScreen(onNavigateBack: () -> Unit) {
     LaunchedEffect(sortUpdatedAppsFirstFlow) { sortUpdatedAppsFirst = sortUpdatedAppsFirstFlow }
     LaunchedEffect(autoBackupAppsFlow) { autoBackupApps = autoBackupAppsFlow }
     LaunchedEffect(autoEnableNewAppsFlow) { autoBackupForNewApps = autoEnableNewAppsFlow }
+    LaunchedEffect(autoBackupSystemAppsFlow) { autoBackupSystemApps = autoBackupSystemAppsFlow }
     LaunchedEffect(themeFlow) { theme = themeFlow }
     LaunchedEffect(blackBackgroundFlow) { blackBackground = blackBackgroundFlow }
     LaunchedEffect(useSystemAccentColorFlow) { useSystemAccentColor = useSystemAccentColorFlow }
@@ -169,17 +175,14 @@ fun PreferencesScreen(onNavigateBack: () -> Unit) {
         onDispose { lifecycle.removeObserver(observer) }
     }
 
-    val initialShowSystem = remember {
-        ApplicationPreferences.get(ApplicationPreferences.SHOW_SYSTEM_PACKAGES_KEY, ApplicationPreferences.SHOW_SYSTEM_PACKAGES_DEFAULT)
-    }
-    val initialShowSystemUpdated = remember {
-        ApplicationPreferences.get(ApplicationPreferences.SHOW_SYSTEM_PACKAGES_ONLY_IF_UPDATED_KEY, ApplicationPreferences.SHOW_SYSTEM_PACKAGES_ONLY_IF_UPDATED_DEFAULT)
-    }
     val initialAutoBackup = remember {
         ApplicationPreferences.get(ApplicationPreferences.AUTO_BACKUP_APPS_KEY, ApplicationPreferences.AUTO_BACKUP_APPS_DEFAULT)
     }
     val initialAutoBackupForNewApps = remember {
         ApplicationPreferences.get(ApplicationPreferences.AUTO_BACKUP_NEW_APPS_KEY, ApplicationPreferences.AUTO_BACKUP_NEW_APPS_DEFAULT)
+    }
+    val initialAutoBackupSystemApps = remember {
+        ApplicationPreferences.get(ApplicationPreferences.AUTO_BACKUP_SYSTEM_APPS_KEY, ApplicationPreferences.AUTO_BACKUP_SYSTEM_APPS_DEFAULT)
     }
     var showBackupWarningDialog by remember { mutableStateOf(false) }
     var isBackupRunning by rememberSaveable { mutableStateOf(false) }
@@ -198,10 +201,9 @@ fun PreferencesScreen(onNavigateBack: () -> Unit) {
 
     fun handleBack() {
         if (autoBackupApps && (
-                (showSystemPackages && (!initialShowSystem)) ||
-                (showSystemPackages && (!showSystemPackagesOnlyIfUpdated) && initialShowSystemUpdated) ||
                 (autoBackupForNewApps && (!initialAutoBackupForNewApps)) ||
-                (!initialAutoBackup)
+                (!initialAutoBackup) ||
+                (autoBackupSystemApps && (!initialAutoBackupSystemApps))
             )) {
             showBackupWarningDialog = true
         } else {
@@ -516,6 +518,19 @@ fun PreferencesScreen(onNavigateBack: () -> Unit) {
                         onCheckedChange = {
                             autoBackupForNewApps = it
                             ApplicationPreferences.put(ApplicationPreferences.AUTO_BACKUP_NEW_APPS_KEY, it)
+                        }
+                    )
+                    SwitchPreference(
+                        title = stringResource(R.string.auto_backup_system_apps),
+                        summary = stringResource(
+                            if (autoBackupSystemApps) R.string.auto_backup_system_apps_on
+                            else R.string.auto_backup_system_apps_off
+                        ),
+                        checked = autoBackupSystemApps,
+                        enabled = autoBackupApps && showSystemPackages,
+                        onCheckedChange = {
+                            autoBackupSystemApps = it
+                            ApplicationPreferences.put(ApplicationPreferences.AUTO_BACKUP_SYSTEM_APPS_KEY, it)
                         }
                     )
                     ClickablePreference(

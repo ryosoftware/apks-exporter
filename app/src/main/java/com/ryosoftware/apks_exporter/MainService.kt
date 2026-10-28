@@ -49,8 +49,15 @@ class MainService @Inject constructor(
         fun canAutomaticallyBackup(packageInfo: PackageInfo): Boolean = instance.canAutomaticallyBackup(packageInfo)
         fun canAutomaticallyBackup(packageInfo: PackageInfo, value: Boolean) = instance.canAutomaticallyBackup(packageInfo, value)
         fun hasAutoBackupPreference(packageInfo: PackageInfo): Boolean = instance.hasAutoBackupPreference(packageInfo)
-        fun resolveAutoBackupPreference(packageInfo: PackageInfo, autoEnableBackupForNewApps: Boolean): Boolean =
-            instance.resolveAutoBackupPreference(packageInfo, autoEnableBackupForNewApps)
+        fun resolveAutoBackupPreference(
+            packageInfo: PackageInfo,
+            autoEnableBackupForNewApps: Boolean,
+            autoBackupSystemApps: Boolean
+        ): Boolean = instance.resolveAutoBackupPreference(
+            packageInfo,
+            autoEnableBackupForNewApps,
+            autoBackupSystemApps
+        )
         fun incrementAppUpdateNotificationCount(packageName: String) = instance.incrementAppUpdateNotificationCount(packageName)
         fun doBackup(context: Context, packageInfo: PackageInfo): Boolean = instance.doBackup(context, packageInfo)
         fun getLastBackupVersionNumberKey(packageName: String): String = instance.getLastBackupVersionNumberKey(packageName)
@@ -137,13 +144,18 @@ class MainService @Inject constructor(
     fun hasAutoBackupPreference(packageInfo: PackageInfo): Boolean =
         ApplicationPreferences.containsKey(getCanAutomaticallyBackupAppKey(packageInfo.packageName))
 
-    fun resolveAutoBackupPreference(packageInfo: PackageInfo, autoEnableBackupForNewApps: Boolean): Boolean {
-        var canAutoBackup = canAutomaticallyBackup(packageInfo)
-        if (!hasAutoBackupPreference(packageInfo)) {
-            canAutoBackup = (!isSystemApplication(packageInfo)) && autoEnableBackupForNewApps
-            canAutomaticallyBackup(packageInfo, canAutoBackup)
+    fun resolveAutoBackupPreference(
+        packageInfo: PackageInfo,
+        autoEnableBackupForNewApps: Boolean,
+        autoBackupSystemApps: Boolean
+    ): Boolean {
+        if (hasAutoBackupPreference(packageInfo)) {
+            return canAutomaticallyBackup(packageInfo)
         }
-        return canAutoBackup
+        if (!isSystemApplication(packageInfo)) {
+            return autoEnableBackupForNewApps
+        }
+        return autoBackupSystemApps
     }
 
     private fun getApks(context: Context, packageName: String): Map<String, File>? {

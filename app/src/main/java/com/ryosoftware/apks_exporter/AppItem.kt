@@ -18,7 +18,8 @@ data class AppItem(
     val packageInfo: PackageInfo,
     val stats: StorageStats?,
     val icon: Drawable?,
-    val appLabel: String
+    val appLabel: String,
+    val resolvedCanAutomaticallyBackup: Boolean
 ) {
     val packageName: String get() = packageInfo.packageName
     val versionName: String? get() = packageInfo.versionName
@@ -51,10 +52,15 @@ data class AppItem(
         return stats.appBytes + stats.dataBytes + stats.cacheBytes
     }
 
-    fun canAutomaticallyBackup(): Boolean = MainService.canAutomaticallyBackup(packageInfo)
+    fun canAutomaticallyBackup(): Boolean =
+        if (MainService.hasAutoBackupPreference(packageInfo)) {
+            MainService.canAutomaticallyBackup(packageInfo)
+        } else {
+            resolvedCanAutomaticallyBackup
+        }
     fun canAutomaticallyBackup(value: Boolean) = MainService.canAutomaticallyBackup(packageInfo, value)
     fun observeCanAutomaticallyBackup(): Flow<Boolean> = ApplicationPreferences.observe(
-        MainService.getCanAutomaticallyBackupAppKey(packageName), true
+        MainService.getCanAutomaticallyBackupAppKey(packageName), resolvedCanAutomaticallyBackup
     )
     fun setBackupDone() = MainService.setBackupDone(packageInfo)
 

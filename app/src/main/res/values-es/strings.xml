@@ -59,13 +59,17 @@
     <string name="automation">Automatización</string>
 
     <string name="auto_backup_apps">Guardado automático</string>
-    <string name="auto_backup_apps_on">Guardar automáticamente los APK de las apps que se instalen o actualicen (se siguen las preferencias de visualización seleccionadas más arriba).\nUn proceso en segundo plano se ejecutará cada cierto tiempo y revisará las apps que siguen los criterios (si una app se actualiza varias veces en ese periodo se perdería pate de la historia)</string>
+    <string name="auto_backup_apps_on">Guardar automáticamente los APK de las apps que se instalen o actualicen. Las apps incluidas se controlan con las opciones de esta sección y con el ajuste de backup automático de cada app.\nUn proceso en segundo plano se ejecutará cada cierto tiempo y revisará las apps que siguen los criterios (si una app se actualiza varias veces en ese periodo se perdería parte de la historia)</string>
     <string name="auto_backup_apps_off">No guardar automáticamente los APK de las apps que se instalen o actualicen</string>
     <string name="can_automatically_backup">Guardar automáticamente</string>
 
     <string name="auto_enable_new_apps">Apps nuevas</string>
     <string name="auto_enable_new_apps_on">Las apps recién instaladas tendrán el backup automático activado por defecto</string>
     <string name="auto_enable_new_apps_off">Las apps recién instaladas no tendrán el backup automático activado por defecto</string>
+
+    <string name="auto_backup_system_apps">Apps de sistema</string>
+    <string name="auto_backup_system_apps_on">Todas las apps de sistema tendrán el backup automático activado por defecto</string>
+    <string name="auto_backup_system_apps_off">Las apps de sistema no tendrán el backup automático activado por defecto</string>
 
     <string name="force_backup_now">Crear backups pendientes ahora</string>
     <string name="auto_backup_last_date">Última ejecución: %1$s</string>
@@ -191,7 +195,7 @@
     <string name="manage_all_files">Gestionar todos los archivos</string>
     <string name="install_source">Instalada desde</string>
     <string name="backup_warning_title">Ajustes modificados</string>
-    <string name="backup_warning_message">Has activado la copia de seguridad automática y/o cambiado la visibilidad de las apps. Esto puede provocar copias de seguridad no deseadas de muchas apps. ¿Quieres marcar todas las apps actuales como ya respaldadas?</string>
+    <string name="backup_warning_message">Has activado la copia de seguridad automática y/o cambiado ajustes que afectan a las apps que se respaldan automáticamente. Esto puede provocar copias de seguridad no deseadas de muchas apps. ¿Quieres marcar todas las apps actuales como ya respaldadas?</string>
     <string name="backup_warning_skip">Sí, omitir backup</string>
     <string name="backup_warning_continue">No, continuar</string>
     <string name="backup_warning_continue_editing">Seguir editando</string>

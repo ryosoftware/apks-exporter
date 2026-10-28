@@ -35,7 +35,12 @@ class MainActivity : AppCompatActivity() {
                         )
                     }
                     composable("preferences") {
-                        PreferencesScreen(onNavigateBack = { navController.popBackStack() })
+                        PreferencesScreen(
+                            onNavigateBack = {
+                                navController.popBackStack()
+                                viewModel.loadData()
+                            }
+                        )
                     }
                     composable(
                         route = "app_detail/{packageName}",
