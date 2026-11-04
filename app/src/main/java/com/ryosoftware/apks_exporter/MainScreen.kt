@@ -40,7 +40,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ryosoftware.apks_exporter.main_activity.InstallAppTask
 import com.ryosoftware.utilities.PermissionUtilities
 import com.ryosoftware.utilities.StatusBarUtilities
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -503,7 +505,7 @@ private fun doSaveApps(
     scope: kotlinx.coroutines.CoroutineScope,
     onFinish: () -> Unit
 ) {
-    scope.launch {
+    scope.launch(Dispatchers.IO) {
         var success = true
         for (item in items) {
             if (!MainService.doBackup(activity, item.packageInfo)) {
@@ -511,14 +513,16 @@ private fun doSaveApps(
                 break
             }
         }
-        onFinish()
-        Toast.makeText(
-            activity,
-            if (success) R.string.operation_done else R.string.cant_complete_requested_operation,
-            Toast.LENGTH_LONG
-        ).show()
-        viewModel.loadData()
-        activity.sendBroadcast(Intent(ACTION_SAVE_TASKS_FINISHED))
+        withContext(Dispatchers.Main) {
+            onFinish()
+            Toast.makeText(
+                activity,
+                if (success) R.string.operation_done else R.string.cant_complete_requested_operation,
+                Toast.LENGTH_LONG
+            ).show()
+            viewModel.loadData()
+            activity.sendBroadcast(Intent(ACTION_SAVE_TASKS_FINISHED))
+        }
     }
 }
 
